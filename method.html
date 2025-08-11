@@ -130,7 +130,8 @@
           audio:'',
           onopen:()=>{},
           onmessage:(message,model)=>{
-            console.log(message)
+            console.log(message);
+            document.getElementById('result').innerHTML += message;
           },
           onclose:(error,model)=>{},
           stopStatus:{value:false}
@@ -139,5 +140,9 @@
 
       main()
     </script>
+
+    <div>
+      <div id="result"></div>  
+    </div>
   </body>
 </html>
