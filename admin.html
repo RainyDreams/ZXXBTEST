@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成绩管理系统后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- 配置Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        accent: '#722ED1',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        dark: '#1D2129',
+                        'gray-light': '#F2F3F5',
+                        'gray-medium': '#C9CDD4'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .sidebar-item {
+                @apply flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-primary/10 hover:text-primary rounded-lg transition-all duration-200;
+            }
+            .sidebar-item.active {
+                @apply bg-primary/10 text-primary font-medium;
+            }
+            .card {
+                @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md;
+            }
+            .btn {
+                @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2;
+            }
+            .btn-primary {
+                @apply bg-primary text-white hover:bg-primary/90;
+            }
+            .btn-outline {
+                @apply border border-gray-300 hover:border-primary hover:text-primary;
+            }
+            .input {
+                @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-light min-h-screen font-sans">
+    <!-- 登录界面 -->
+    <div id="login-screen" class="flex items-center justify-center min-h-screen p-4">
+        <div class="card w-full max-w-md p-6 md:p-8">
+            <div class="text-center mb-6">
+                <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark mb-2">成绩管理系统</h1>
+                <p class="text-gray-500">请登录后台管理系统</p>
+            </div>
+            
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                    <input type="text" id="username" name="username" class="input" placeholder="请输入用户名" required>
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                    <input type="password" id="password" name="password" class="input" placeholder="请输入密码" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full justify-center">
+                    <i class="fa fa-sign-in"></i> 登录
+                </button>
+            </form>
+            
+            <div id="login-error" class="mt-4 text-danger text-sm hidden"></div>
+        </div>
+    </div>
+
+    <!-- 主界面 (初始隐藏) -->
+    <div id="main-screen" class="hidden flex h-screen overflow-hidden">
+        <!-- 侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-xl font-bold text-primary">成绩管理系统</h1>
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto p-3">
+                <ul class="space-y-1">
+                    <li><a href="#dashboard" class="sidebar-item active" data-target="dashboard-panel"><i class="fa fa-dashboard"></i> 数据仪表板</a></li>
+                    <li><a href="#score-entry" class="sidebar-item" data-target="score-entry-panel"><i class="fa fa-file-text-o"></i> 录入成绩</a></li>
+                    <li><a href="#user-data" class="sidebar-item" data-target="user-data-panel"><i class="fa fa-users"></i> 用户数据</a></li>
+                    <li><a href="#exam-data" class="sidebar-item" data-target="exam-data-panel"><i class="fa fa-bar-chart"></i> 考试数据</a></li>
+                </ul>
+            </nav>
+            
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">管理员</p>
+                        <p class="text-xs text-gray-500">系统管理员</p>
+                    </div>
+                    <button id="logout-btn" class="ml-auto text-gray-400 hover:text-danger">
+                        <i class="fa fa-sign-out"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航 -->
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+                <div class="flex items-center gap-4">
+                    <button id="sidebar-toggle" class="lg:hidden text-gray-500 hover:text-primary">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                    <h2 id="panel-title" class="text-lg font-semibold">数据仪表板</h2>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <input type="text" placeholder="搜索..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                        <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    
+                    <div class="relative">
+                        <button class="text-gray-500 hover:text-primary relative">
+                            <i class="fa fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-danger rounded-full text-white text-xs flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 内容面板 -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- 仪表板面板 -->
+                <div id="dashboard-panel" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="card p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm mb-1">总考试次数</p>
+                                    <h3 id="total-exams" class="text-3xl font-bold text-dark">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                    </h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <i class="fa fa-calendar text-xl"></i>
+                                </div>
+                            </div>
+                            <div id="total-exams-trend" class="mt-4 flex items-center text-sm">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm mb-1">总学生数</p>
+                                    <h3 id="total-students" class="text-3xl font-bold text-dark">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                    </h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                                    <i class="fa fa-users text-xl"></i>
+                                </div>
+                            </div>
+                            <div id="total-students-trend" class="mt-4 flex items-center text-sm">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm mb-1">平均及格率</p>
+                                    <h3 id="average-pass-rate" class="text-3xl font-bold text-dark">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                    </h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center text-success">
+                                    <i class="fa fa-check-circle text-xl"></i>
+                                </div>
+                            </div>
+                            <div id="average-pass-rate-trend" class="mt-4 flex items-center text-sm">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card p-6">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm mb-1">平均成绩</p>
+                                    <h3 id="average-score" class="text-3xl font-bold text-dark">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                    </h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                                    <i class="fa fa-line-chart text-xl"></i>
+                                </div>
+                            </div>
+                            <div id="average-score-trend" class="mt-4 flex items-center text-sm">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="font-semibold text-lg">科目分布</h3>
+                                <div class="flex gap-2">
+                                    <button class="btn btn-outline text-sm px-3 py-1" data-period="monthly">月度</button>
+                                    <button class="btn btn-primary text-sm px-3 py-1" data-period="all">全部</button>
+                                </div>
+                            </div>
+                            <div class="h-80">
+                                <canvas id="subject-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="font-semibold text-lg">各科目平均成绩</h3>
+                                <div class="flex gap-2">
+                                    <button class="btn btn-outline text-sm px-3 py-1" data-period="term">学期</button>
+                                    <button class="btn btn-primary text-sm px-3 py-1" data-period="all">全部</button>
+                                </div>
+                            </div>
+                            <div class="h-80">
+                                <canvas id="score-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 录入成绩面板 -->
+                <div id="score-entry-panel" class="hidden space-y-6">
+                    <div class="card p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <h3 class="font-semibold text-lg">考试列表</h3>
+                            <button id="fetch-scores-btn" class="btn btn-primary self-start md:self-auto">
+                                <i class="fa fa-refresh"></i> 加载考试数据
+                            </button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">考试名称</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">文件ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="exam-list" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-10 text-center text-gray-500">
+                                            <i class="fa fa-spinner fa-spin mr-2"></i> 加载考试列表中...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 用户数据面板 -->
+                <div id="user-data-panel" class="hidden space-y-6">
+                    <div class="card p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <h3 class="font-semibold text-lg">学生数据列表</h3>
+                            <div class="flex flex-col sm:flex-row gap-3 self-start md:self-auto">
+                                <div class="relative">
+                                    <input type="text" id="user-search" placeholder="搜索学生..." class="input pl-10">
+                                    <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                </div>
+                                <button class="btn btn-outline whitespace-nowrap">
+                                    <i class="fa fa-filter"></i> 筛选
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学号</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户名</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">真实姓名</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学校</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">省份</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">注册时间</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-list" class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                                            <i class="fa fa-spinner fa-spin mr-2"></i> 加载学生数据中...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-6 flex items-center justify-between">
+                            <p class="text-sm text-gray-500">显示 <span id="showing-range">0-0</span> 条，共 <span id="total-users">0</span> 条记录</p>
+                            <div class="flex items-center gap-2" id="pagination-controls">
+                                <button class="btn btn-outline px-3 py-1" id="prev-page" disabled>上一页</button>
+                                <button class="btn btn-primary px-3 py-1" data-page="1">1</button>
+                                <button class="btn btn-outline px-3 py-1" id="next-page">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 考试数据面板 -->
+                <div id="exam-data-panel" class="hidden space-y-6">
+                    <div class="card p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                            <h3 class="font-semibold text-lg">考试数据分析</h3>
+                            <div class="flex flex-col sm:flex-row gap-3 self-start md:self-auto">
+                                <select id="exam-select" class="input">
+                                    <option value="">请选择考试</option>
+                                </select>
+                                <button id="view-exam-data" class="btn btn-primary" disabled>
+                                    <i class="fa fa-search"></i> 查看数据
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="exam-data-placeholder" class="py-16 text-center text-gray-500">
+                            <i class="fa fa-bar-chart text-5xl mb-4 opacity-30"></i>
+                            <p>请选择一个考试查看详细数据</p>
+                        </div>
+                        
+                        <div id="exam-data-details" class="hidden space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="bg-gray-light p-4 rounded-lg">
+                                    <p class="text-gray-500 text-sm mb-1">平均分</p>
+                                    <h3 id="exam-average" class="text-2xl font-bold text-dark">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                    </h3>
+                                </div>
+                                <div class="bg-gray-light p-4 rounded-lg">
+                                    <p class="text-gray-500 text-sm mb-1">最高分</p>
+                                    <h3 id="exam-highest" class="text-2xl font-bold text-dark">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                    </h3>
+                                </div>
+                                <div class="bg-gray-light p-4 rounded-lg">
+                                    <p class="text-gray-500 text-sm mb-1">最低分</p>
+                                    <h3 id="exam-lowest" class="text-2xl font-bold text-dark">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                    </h3>
+                                </div>
+                            </div>
+                            
+                            <div class="h-80">
+                                <canvas id="exam-score-distribution"></canvas>
+                            </div>
+                            
+                            <div class="overflow-x-auto mt-6">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">班级</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">平均分</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">最高分</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">最低分</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">及格率</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="class-score-list" class="bg-white divide-y divide-gray-200">
+                                        <tr>
+                                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                                                <i class="fa fa-spinner fa-spin mr-2"></i> 加载班级数据中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 全局变量
+        let exams = [];
+        let users = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let itemsPerPage = 10;
+        let subjectChart = null;
+        let scoreChart = null;
+        let distributionChart = null;
+        
+        // DOM加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化图表实例
+            initCharts();
+            
+            // 登录表单提交
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const errorEl = document.getElementById('login-error');
+                errorEl.classList.add('hidden');
+                
+                if (!username || !password) {
+                    errorEl.textContent = '用户名和密码不能为空';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 登录中...';
+                
+                fetch('adminbackend.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    credentials: 'include',
+                    body: `action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+                })
+                .then(handleResponse)
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('login-screen').classList.add('hidden');
+                        document.getElementById('main-screen').classList.remove('hidden');
+                        
+                        // 加载所有必要数据
+                        loadDashboardData();
+                        loadExamList();
+                        loadUsers();
+                    } else {
+                        errorEl.textContent = data.message || '登录失败，请重试';
+                        errorEl.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('登录错误:', error);
+                    errorEl.textContent = '登录时发生错误: ' + error.message;
+                    errorEl.classList.remove('hidden');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
+            });
+            
+            // 登出按钮
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                fetch('adminbackend.php?action=logout', {
+                    credentials: 'include'
+                })
+                .then(handleResponse)
+                .then(data => {
+                    document.getElementById('main-screen').classList.add('hidden');
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('login-form').reset();
+                    document.getElementById('login-error').classList.add('hidden');
+                })
+                .catch(error => {
+                    console.error('登出错误:', error);
+                    alert('登出时发生错误');
+                });
+            });
+            
+            // 侧边栏切换
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    document.querySelectorAll('.sidebar-item').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    const targetPanel = this.getAttribute('data-target');
+                    document.querySelectorAll('[id$="-panel"]').forEach(panel => {
+                        panel.classList.add('hidden');
+                    });
+                    document.getElementById(targetPanel).classList.remove('hidden');
+                    
+                    document.getElementById('panel-title').textContent = this.textContent.trim();
+                });
+            });
+            
+            // 加载考试数据按钮
+            document.getElementById('fetch-scores-btn').addEventListener('click', function() {
+                this.disabled = true;
+                this.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 正在加载...';
+                
+                fetch('adminbackend.php?action=fetchScores', {
+                    credentials: 'include'
+                })
+                .then(handleResponse)
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        loadExamList();
+                        loadDashboardData();
+                    } else {
+                        alert('加载失败: ' + (data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('加载考试数据错误:', error);
+                    alert('加载考试数据时发生错误: ' + error.message);
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fa fa-refresh"></i> 加载考试数据';
+                });
+            });
+            
+            // 查看考试数据按钮
+            document.getElementById('view-exam-data').addEventListener('click', function() {
+                const examGuid = document.getElementById('exam-select').value;
+                if (!examGuid) return;
+                
+                document.getElementById('exam-data-placeholder').classList.add('hidden');
+                document.getElementById('exam-data-details').classList.remove('hidden');
+                document.getElementById('class-score-list').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                            <i class="fa fa-spinner fa-spin mr-2"></i> 加载考试数据中...
+                        </td>
+                    </tr>
+                `;
+                
+                // 重置加载状态
+                document.getElementById('exam-average').innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                document.getElementById('exam-highest').innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                document.getElementById('exam-lowest').innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                
+                fetch(`adminbackend.php?action=getExamData&guid=${encodeURIComponent(examGuid)}`, {
+                    credentials: 'include'
+                })
+                .then(handleResponse)
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('exam-average').textContent = data.data.summary.averageScore;
+                        document.getElementById('exam-highest').textContent = data.data.summary.highestScore;
+                        document.getElementById('exam-lowest').textContent = data.data.summary.lowestScore;
+                        
+                        drawScoreDistributionChart(data.data.studentScores);
+                        updateClassScoreList(data.data.classData);
+                    } else {
+                        alert('获取考试数据失败: ' + (data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('获取考试数据错误:', error);
+                    alert('获取考试数据时发生错误: ' + error.message);
+                });
+            });
+            
+            // 考试选择变化时启用/禁用查看按钮
+            document.getElementById('exam-select').addEventListener('change', function() {
+                document.getElementById('view-exam-data').disabled = !this.value;
+            });
+            
+            // 学生搜索功能
+            document.getElementById('user-search').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredUsers = users.filter(user => {
+                    return (user.id && user.id.toLowerCase().includes(searchTerm)) ||
+                           (user.username && user.username.toLowerCase().includes(searchTerm)) ||
+                           (user.real_name && user.real_name.toLowerCase().includes(searchTerm)) ||
+                           (user.school && user.school.toLowerCase().includes(searchTerm));
+                });
+                
+                displayUsers(filteredUsers, 1); // 重置到第一页
+            });
+            
+            // 分页控制
+            document.getElementById('prev-page').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    displayUsers(users, currentPage - 1);
+                }
+            });
+            
+            document.getElementById('next-page').addEventListener('click', function() {
+                if (currentPage < totalPages) {
+                    displayUsers(users, currentPage + 1);
+                }
+            });
+            
+            // 科目分布图表周期切换
+            document.querySelectorAll('#dashboard-panel .btn[data-period]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const period = this.getAttribute('data-period');
+                    const isSubjectChart = this.closest('div').nextElementSibling.querySelector('canvas').id === 'subject-chart';
+                    
+                    // 更新按钮状态
+                    this.parentElement.querySelectorAll('.btn').forEach(b => {
+                        b.classList.remove('btn-primary');
+                        b.classList.add('btn-outline');
+                    });
+                    this.classList.remove('btn-outline');
+                    this.classList.add('btn-primary');
+                    
+                    // 重新加载数据
+                    loadDashboardData(period, isSubjectChart);
+                });
+            });
+        });
+        
+        // 初始化图表
+        function initCharts() {
+            const subjectCtx = document.getElementById('subject-chart').getContext('2d');
+            const scoreCtx = document.getElementById('score-chart').getContext('2d');
+            const distributionCtx = document.getElementById('exam-score-distribution').getContext('2d');
+            
+            // 创建空图表
+            subjectChart = new Chart(subjectCtx, {
+                type: 'doughnut',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+            
+            scoreChart = new Chart(scoreCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ label: '平均分', data: [] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+            
+            distributionChart = new Chart(distributionCtx, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ label: '学生数量', data: [] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+        
+        // 加载仪表板数据
+        function loadDashboardData(period = 'all', isSubjectChart = true) {
+            const url = `adminbackend.php?action=getDashboardData&period=${period}&chartType=${isSubjectChart ? 'subject' : 'score'}`;
+            
+            fetch(url, { credentials: 'include' })
+                .then(handleResponse)
+                .then(data => {
+                    if (data.status === 'success') {
+                        const dashboardData = data.data;
+                        
+                        // 更新统计数据
+                        document.getElementById('total-exams').textContent = dashboardData.totalExams;
+                        document.getElementById('total-students').textContent = dashboardData.totalStudents;
+                        document.getElementById('average-pass-rate').textContent = dashboardData.averagePassRate ? 
+                            dashboardData.averagePassRate + '%' : '0%';
+                        document.getElementById('average-score').textContent = dashboardData.averageScore || '0';
+                        
+                        // 更新趋势数据
+                        updateTrendElement('total-exams-trend', dashboardData.examsTrend);
+                        updateTrendElement('total-students-trend', dashboardData.studentsTrend);
+                        updateTrendElement('average-pass-rate-trend', dashboardData.passRateTrend);
+                        updateTrendElement('average-score-trend', dashboardData.scoreTrend);
+                        
+                        // 绘制图表
+                        if (isSubjectChart) {
+                            drawSubjectChart(dashboardData.subjectDistribution);
+                        } else {
+                            drawScoreChart(dashboardData.subjectScores);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('获取仪表板数据错误:', error);
+                    showDataLoadError('dashboard-panel');
+                });
+        }
+        
+        // 更新趋势元素显示
+        function updateTrendElement(elementId, trendData) {
+            const element = document.getElementById(elementId);
+            if (!trendData || !trendData.change || !trendData.comparison) return;
+            
+            const isPositive = trendData.change >= 0;
+            element.innerHTML = `
+                <span class="${isPositive ? 'text-success' : 'text-danger'} flex items-center gap-1">
+                    <i class="fa fa-arrow-${isPositive ? 'up' : 'down'}"></i>
+                    <span>${Math.abs(trendData.change)}%</span>
+                    <span class="text-gray-500">${trendData.comparison}</span>
+                </span>
+            `;
+        }
+        
+        // 绘制科目分布图表
+        function drawSubjectChart(data) {
+            if (!data || !data.labels || !data.values) return;
+            
+            // 生成随机颜色
+            const bgColors = data.labels.map(() => 
+                `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.7)`
+            );
+            
+            subjectChart.data.labels = data.labels;
+            subjectChart.data.datasets[0].data = data.values;
+            subjectChart.data.datasets[0].backgroundColor = bgColors;
+            subjectChart.update();
+        }
+        
+        // 绘制科目分数图表
+        function drawScoreChart(data) {
+            if (!data || !data.labels || !data.values) return;
+            
+            scoreChart.data.labels = data.labels;
+            scoreChart.data.datasets[0].data = data.values;
+            scoreChart.data.datasets[0].backgroundColor = 'rgba(22, 93, 255, 0.7)';
+            scoreChart.update();
+        }
+        
+        // 绘制成绩分布图表（使用真实数据）
+        function drawScoreDistributionChart(studentScores) {
+            const ctx = document.getElementById('exam-score-distribution').getContext('2d');
+            
+            // 销毁已存在的图表
+            if (distributionChart) {
+                distributionChart.destroy();
+            }
+
+            // 计算分数分布（0-10, 10-20, ..., 90-100+）
+            const distribution = new Array(10).fill(0);
+            studentScores.forEach(score => {
+                const normalizedScore = Math.min(score, 100); // 超过100分的归为最后一组
+                const index = Math.floor(normalizedScore / 10);
+                distribution[index]++;
+            });
+
+            // 分数段标签
+            const labels = [
+                '0-10', '10-20', '20-30', '30-40', '40-50',
+                '50-60', '60-70', '70-80', '80-90', '90-100+'
+            ];
+
+            distributionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '学生人数',
+                        data: distribution,
+                        backgroundColor: 'rgba(22, 93, 255, 0.7)',
+                        borderColor: 'rgba(22, 93, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0 // 确保显示整数
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 加载考试列表
+        function loadExamList() {
+            fetch('adminbackend.php?action=getExamList', { credentials: 'include' })
+                .then(handleResponse)
+                .then(data => {
+                    if (data.status === 'success') {
+                        exams = data.data;
+                        const examListEl = document.getElementById('exam-list');
+                        const examSelectEl = document.getElementById('exam-select');
+                        
+                        // 清空现有选项
+                        examSelectEl.innerHTML = '<option value="">请选择考试</option>';
+                        
+                        if (exams.length === 0) {
+                            examListEl.innerHTML = `
+                                <tr>
+                                    <td colspan="4" class="px-6 py-10 text-center text-gray-500">
+                                        暂无考试数据，请点击"加载考试数据"按钮
+                                    </td>
+                                </tr>
+                            `;
+                            return;
+                        }
+                        
+                        // 填充考试列表
+                        let html = '';
+                        exams.forEach(exam => {
+                            const statusClass = exam.status === 'completed' ? 'text-success' : 'text-warning';
+                            const statusText = exam.status === 'completed' ? '已完成' : '待处理';
+                            
+                            html += `
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">${exam.name}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">${exam.guid}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                                            ${statusText}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                                        <button class="text-gray-500 hover:text-gray-700">编辑</button>
+                                    </td>
+                                </tr>
+                            `;
+                            
+                            // 添加到下拉选择框
+                            const option = document.createElement('option');
+                            option.value = exam.guid;
+                            option.textContent = exam.name;
+                            examSelectEl.appendChild(option);
+                        });
+                        
+                        examListEl.innerHTML = html;
+                    }
+                })
+                .catch(error => {
+                    console.error('加载考试列表错误:', error);
+                    document.getElementById('exam-list').innerHTML = `
+                        <tr>
+                            <td colspan="4" class="px-6 py-10 text-center text-danger">
+                                加载考试列表失败: ${error.message}
+                            </td>
+                        </tr>
+                    `;
+                });
+        }
+        
+        // 加载用户数据
+        function loadUsers(page = 1) {
+            fetch(`adminbackend.php?action=getUsers&page=${page}&perPage=${itemsPerPage}`, { credentials: 'include' })
+                .then(handleResponse)
+                .then(data => {
+                    if (data.status === 'success') {
+                        users = data.data.users;
+                        const total = data.data.total;
+                        totalPages = Math.ceil(total / itemsPerPage);
+                        
+                        displayUsers(users, page, total);
+                    }
+                })
+                .catch(error => {
+                    console.error('加载用户数据错误:', error);
+                    document.getElementById('user-list').innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-10 text-center text-danger">
+                                加载用户数据失败: ${error.message}
+                            </td>
+                        </tr>
+                    `;
+                });
+        }
+        
+        // 显示用户数据
+        function displayUsers(users, page, total = null) {
+            currentPage = page;
+            const userListEl = document.getElementById('user-list');
+            
+            if (users.length === 0) {
+                userListEl.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                            暂无学生数据
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // 更新总记录数
+            const totalUsers = total !== null ? total : users.length;
+            document.getElementById('total-users').textContent = totalUsers;
+            
+            // 更新显示范围
+            const start = (page - 1) * itemsPerPage + 1;
+            const end = Math.min(page * itemsPerPage, totalUsers);
+            document.getElementById('showing-range').textContent = `${start}-${end}`;
+            
+            // 更新分页按钮状态
+            document.getElementById('prev-page').disabled = page <= 1;
+            document.getElementById('next-page').disabled = page >= totalPages;
+            
+            // 填充用户列表
+            let html = '';
+            users.forEach(user => {
+                html += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">${user.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${user.username}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${user.real_name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${user.school}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${user.province}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">${user.registration_time}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-primary hover:text-primary/80 mr-3">详情</button>
+                            <button class="text-gray-500 hover:text-gray-700">编辑</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            userListEl.innerHTML = html;
+        }
+        
+        // 更新班级分数列表
+        function updateClassScoreList(classData) {
+            const classListEl = document.getElementById('class-score-list');
+            
+            if (!classData || classData.length === 0) {
+                classListEl.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                            暂无班级数据
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            classData.forEach(classItem => {
+                html += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">${classItem.className}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${classItem.averageScore}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${classItem.highestScore}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${classItem.lowestScore}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${classItem.passRate}%</td>
+                    </tr>
+                `;
+            });
+            
+            classListEl.innerHTML = html;
+        }
+        
+        // 处理响应
+        function handleResponse(response) {
+            if (!response.ok) {
+                throw new Error(`HTTP错误: ${response.status}`);
+            }
+            return response.json().then(data => {
+                if (data.status === 'error') {
+                    throw new Error(data.message || '操作失败');
+                }
+                return data;
+            });
+        }
+        
+        // 显示数据加载错误
+        function showDataLoadError(panelId) {
+            const panel = document.getElementById(panelId);
+            if (panel) {
+                panel.innerHTML = `
+                    <div class="text-center py-10 text-danger">
+                        <i class="fa fa-exclamation-circle text-2xl mb-2"></i>
+                        <p>数据加载失败，请刷新页面重试</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="stylesheet" href="dynamic-logo.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>隐私政策 - 智析学伴</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --accent: #6366f1;
+            --light: #e0f2fe;
+            --dark: #0f172a;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        /* Logo样式已移至dynamic-logo.css */
+        .logo {
+            /* 保留容器样式，具体文字样式在dynamic-logo.css中定义 */
+        }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-Index: 50;
+            background-color: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(55, 65, 81, 0.8);
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e3a8a',
+                        secondary: '#3b82f6',
+                        dark: '#0f172a',
+                        light: '#e0f2fe'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    },
+                    boxShadow: {
+                        'custom': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                    }
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-transform-opacity {
+                transition-property: transform, opacity;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-gray-200 min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header class="top-nav">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="logo"><span class="logo-text">智析学伴</span></div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="feedback.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">在线反馈
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="faq.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">常见问题
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="contact.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">联系方式
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="terms.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">服务条款
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="privacy2.html" class="text-white font-medium transition-colors duration-300 relative group">隐私政策
+                    <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary"></span>
+                </a>
+            </nav>
+            <button class="md:hidden text-gray-300 hover:text-white" id="mobile-menu-button">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="md:hidden hidden bg-dark/95 border-b border-gray-700" id="mobile-menu">
+                <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                    <a href="help.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">帮助中心</a>
+                    <a href="feedback.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">在线反馈</a>
+                    <a href="faq.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">常见问题</a>
+                    <a href="contact.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">联系方式</a>
+                    <a href="privacy2.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">隐私政策</a>
+                </div>
+            </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow container mx-auto px-4 py-8 md:py-12">
+        <section class="max-w-3xl mx-auto bg-dark/50 rounded-xl p-6 md:p-8 shadow-custom animate-fade-in">
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-6 text-center">AI学习解题软件隐私政策</h1>
+            <div class="text-center text-sm text-gray-400 mb-8">
+                <p>生效日期：2025年8月6日 | 最后更新：2025年8月6日</p>
+            </div>
+            <div class="space-y-6 text-gray-300">
+                <div>
+                    <h2 class="text-xl font-semibold text-white mb-3">一、我们收集的信息</h2>
+                    <div class="pl-4 border-l-2 border-primary/50 space-y-4">
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">1. 用户账户信息</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>注册时收集：手机号/邮箱、用户名、密码（加密存储）</li>
+                                <li>学生身份验证：学校、年级（用于个性化学习）</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">2. 学习行为数据</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>解题记录：上传的题目（含文字/图片）、答题步骤、批改结果</li>
+                                <li>交互数据：AI功能使用频次、功能偏好、页面停留时长</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">3. 设备与技术信息</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>设备标识符（如IMEI）、操作系统版本、网络类型</li>
+                                <li>AI服务必需：摄像头权限（用于拍照搜题）、存储权限（题目缓存）</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">4. 未成年人信息（若适用）</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>根据COPPA要求：仅收集必要信息，需家长书面同意</li>
+                                <li>禁用行为追踪广告</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-white mb-3">二、数据共享与披露</h2>
+                    <div class="pl-4 border-l-2 border-primary/50 space-y-4">
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">1. 严格禁止</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>不出售或出租用户题目数据给第三方</li>
+                                <li>不将学生答题记录用于广告精准投放</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">2. 有限共享场景</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>第三方AI服务商（如OCR识别服务）：仅共享题目图片，签订数据保护协议</li>
+                                <li>法律要求：配合司法机关提供必要信息</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-primary/10 p-4 rounded-lg border-l-4 border-primary">
+                        <p class="font-medium text-white">重要提示：</p>
+                        <p class="text-gray-300 mt-1">在任何情况下，我们都不会将您的学习数据用于与教育无关的商业目的，保护您的隐私是我们的首要任务。</p>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-white mb-3">三、AI数据处理特别说明</h2>
+                    <div class="pl-4 border-l-2 border-primary/50 space-y-4">
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">1. 模型训练</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>用户上传的题目及解析将匿名化脱敏后用于算法训练</li>
+                                <li>用户可设置"禁用我的数据训练模型"（账户设置中开启）</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">2. 解题结果透明度</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>AI生成答案会标注"算法建议，仅供参考"</li>
+                                <li>关键解题步骤提供置信度提示（如"此步骤准确率92%"）</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-white mb-3">四、数据安全措施</h2>
+                    <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                        <li>存储加密：用户上传题目采用AES-256加密存储</li>
+                        <li>权限隔离：教师/家长账号与学生账号数据访问分级控制</li>
+                        <li>定期审计：每季度进行数据安全渗透测试</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-white mb-3">五、您的权利</h2>
+                    <div class="pl-4 border-l-2 border-primary/50 space-y-4">
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">1. 数据管理</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>导出学习报告：支持CSV格式导出历史答题记录</li>
+                                <li>删除账户：7天内可自助恢复，永久删除后题目数据不可逆清除</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-white mb-2">2. 未成年人保护</h3>
+                            <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                                <li>家长可通过 <a href="mailto:privacy@zhixi.cn" class="text-primary hover:underline">privacy@zhixi.cn</a> 或客服申请查阅子女数据</li>
+                                <li>默认关闭"学习数据成就分享"功能</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-white mb-3">六、政策更新</h2>
+                    <ul class="list-disc list-inside space-y-1 text-gray-400 pl-2">
+                        <li>重大变更（如新增数据用途）将通过APP弹窗+短信通知</li>
+                        <li>历史版本可在<a href="#" class="text-primary hover:underline">设置-关于我们</a>中查阅</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-400 mb-4">智析学伴 © 2025 版权所有 | 隐私政策版本 v2.3</p>
+                <a href="home.html" class="inline-block mt-2 bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">返回首页</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark border-t border-gray-800 py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fa fa-graduation-cap text-primary text-2xl"></i>
+                        <span class="text-xl font-bold text-white">智析学伴</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">智能分析，精准伴学，让学习更高效。</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300"><i class="fa fa-weibo text-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300"><i class="fa fa-wechat text-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300"><i class="fa fa-github text-lg"></i></a>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <h4 class="text-white font-medium mb-4">快速链接</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="feedback.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">在线反馈
+                            <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a></li>
+                        <li><a href="faq.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">常见问题
+                            <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a></li>
+                        <li><a href="contact.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">联系方式
+                            <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a></li>
+                        <li><a href="terms.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">服务条款
+                            <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a></li>
+                        <li><a href="privacy2.html" class="text-white font-medium transition-colors duration-300 inline-block relative group">隐私政策
+                            <span class="absolute -bottom-0.5 left-0 w-full h-0.5 bg-primary"></span>
+                        </a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h4 class="text-white font-medium mb-4">联系我们</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-start space-x-2">
+                            <i class="fa fa-envelope-o mt-1"></i>
+                            <span>support@zhixibanxue.com</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fa fa-phone mt-1"></i>
+                            <span>400-123-4567</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fa fa-map-marker mt-1"></i>
+                            <span>北京市海淀区中关村大街1号</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h4 class="text-white font-medium mb-4">关注我们</h4>
+                    <p class="text-gray-400 text-sm mb-4">扫描二维码，关注智析学伴公众号</p>
+                    <div class="bg-white p-2 inline-block rounded-lg">
+                        <div class="w-32 h-32 bg-gray-200 flex items-center justify-center">
+                            <i class="fa fa-qrcode text-gray-500 text-5xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
+                <p>© 2023 智析学伴 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 移动端菜单切换
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            function handleMenuToggle() {
+                mobileMenu.classList.toggle('hidden');
+            }
+
+            // 点击菜单按钮切换菜单
+            menuButton.addEventListener('click', handleMenuToggle);
+            menuButton.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                handleMenuToggle();
+            }, { passive: false });
+
+            // 点击页面其他区域关闭菜单
+            document.addEventListener('click', function(e) {
+                if (!menuButton.contains(e.target) && !mobileMenu.contains(e.target) && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+            // 阻止菜单内部点击事件冒泡
+            mobileMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

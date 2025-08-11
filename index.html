@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>智析学伴 - AI学习辅助工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #050a1a;
+            color: #e0e7ff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 多层次科技感背景容器 */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -5;
+            overflow: hidden;
+        }
+        
+        /* 底层网格 */
+        .base-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(rgba(65, 184, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(65, 184, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -4;
+            animation: scrollGrid 60s linear infinite;
+            transform-origin: center;
+        }
+        
+        /* 中层粒子流 */
+        .particle-flow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -3;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(65, 184, 255, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 6px 1px rgba(65, 184, 255, 0.6);
+        }
+        
+        /* 动态连接线网络 */
+        .connection-network {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+        
+        .network-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(155, 89, 182, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 8px 1px rgba(155, 89, 182, 0.5);
+            animation: pulse-node 5s infinite ease-in-out;
+        }
+        
+        .network-link {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(155, 89, 182, 0), rgba(155, 89, 182, 0.4), rgba(155, 89, 182, 0));
+            transform-origin: 0 0;
+            z-index: -1;
+            opacity: 0;
+            animation: linkPulse 8s infinite ease-in-out;
+        }
+
+        /* 动态光晕效果 */
+        .glow-effect {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.2;
+            z-index: -5;
+            animation: pulse 20s infinite ease-in-out;
+        }
+
+        /* 精致闪光点样式 - 增强立体感 */
+        .sparkle {
+            position: fixed;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 40%, rgba(255,255,255,0) 80%);
+            border-radius: 50%;
+            z-index: 0;
+            cursor: pointer;
+            animation: float 8s infinite ease-in-out;
+            transform-origin: center;
+            box-shadow: 
+                0 0 10px 2px rgba(255, 255, 255, 0.9),
+                0 0 20px 5px rgba(65, 184, 255, 0.7),
+                0 0 30px 8px rgba(65, 184, 255, 0.4),
+                inset 0 0 5px 1px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        /* 优化的水珠绽开效果 */
+        .sparkle.droplet {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(65, 184, 255, 0.7) 50%, rgba(65, 184, 255, 0) 80%);
+            pointer-events: none;
+            z-index: 2;
+            box-shadow: 0 0 15px 3px rgba(65, 184, 255, 0.5);
+        }
+
+        /* 动画定义 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg) translateZ(0); }
+            50% { transform: translateY(-20px) rotate(10deg) translateZ(5px); }
+        }
+        
+        @keyframes dropletEffect {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            70% { opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
+        
+        @keyframes pulse-node {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.8); opacity: 1; }
+        }
+        
+        @keyframes linkPulse {
+            0%, 100% { opacity: 0; }
+            40%, 60% { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.5); opacity: 0.35; }
+        }
+        
+        @keyframes scrollGrid {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-25%, -25%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes flowParticle {
+            0% { transform: translateY(-100px) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh) translateX(0); opacity: 0; }
+        }
+
+        /* 右上角导航链接 */
+        .top-links {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            z-index: 100;
+            font-size: 14px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .top-links a {
+            color: rgba(224, 231, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .top-links a:hover {
+            color: #41b8ff;
+            text-shadow: 0 0 8px rgba(65, 184, 255, 0.6);
+        }
+
+        .divider {
+            color: rgba(224, 231, 255, 0.4);
+        }
+
+        /* 主标题区域 */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: #41b8ff;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            text-shadow: 0 0 10px rgba(65, 184, 255, 0.3);
+        }
+
+        .main-title {
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #e0e7ff, #41b8ff, #9b59b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 300% 300%;
+            animation: gradientShift 8s ease infinite;
+            text-shadow: 0 0 20px rgba(65, 184, 255, 0.4);
+        }
+
+        .subtitle-container {
+            height: 70px;
+            margin-bottom: 50px;
+            overflow: hidden;
+        }
+
+        .subtitle {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: #a0b3e8;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .typing {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #41b8ff;
+            animation: typing 0.5s steps(30, end), blink 0.75s step-end infinite;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #3498db, #8e44ad);
+            color: white;
+            padding: 15px 45px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.6);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* 功能区域 */
+        .features {
+            padding: 100px 10%;
+            background: rgba(10, 15, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(65, 184, 255, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature {
+            max-width: 1200px;
+            margin: 0 auto 120px auto;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease;
+        }
+
+        .feature.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .feature-content {
+            flex: 1;
+            padding: 0 40px;
+        }
+
+        .feature-number {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #3498db, #8e44ad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            opacity: 0.3;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #41b8ff;
+        }
+
+        .feature-desc {
+            font-size: 1.2rem;
+            color: #a0b3e8;
+            line-height: 1.8;
+        }
+
+        .feature-image {
+            flex: 1;
+            height: 300px;
+            border-radius: 10px;
+            background: rgba(25, 35, 60, 0.6);
+            border: 1px solid rgba(65, 184, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .feature-image::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: conic-gradient(
+                transparent, 
+                rgba(65, 184, 255, 0.4), 
+                transparent 30%
+            );
+            animation: rotate 6s linear infinite;
+        }
+
+        .feature-image-content {
+            position: relative;
+            z-index: 2;
+            background: rgba(10, 15, 30, 0.9);
+            width: 90%;
+            height: 85%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #41b8ff;
+        }
+
+        /* 动画定义 */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            from, to { border-color: transparent; }
+            50% { border-color: #41b8ff; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 900px) {
+            .main-title {
+                font-size: 3.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.8rem;
+            }
+            
+            .feature {
+                flex-direction: column;
+                margin-bottom: 80px;
+            }
+            
+            .feature:nth-child(even) {
+                flex-direction: column;
+            }
+            
+            .feature-image {
+                width: 100%;
+                margin-top: 30px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-title {
+                font-size: 2.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1.5rem;
+            }
+            
+            .top-links {
+                font-size: 12px;
+                right: 20px;
+            }
+            
+            .btn {
+                padding: 12px 35px;
+                font-size: 1rem;
+            }
+        }
+
+        /* 手机端适配 - 小屏幕设备 */
+        @media (max-width: 480px) {
+            /* 标题调整 */
+            .main-title {
+                font-size: 2.2rem;
+                margin-bottom: 20px;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .subtitle-container {
+                height: 50px;
+                margin-bottom: 30px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+            
+            /* 按钮调整 */
+            .btn {
+                padding: 10px 30px;
+                font-size: 1rem;
+                width: 80%;
+                max-width: 250px;
+            }
+            
+            /* 导航链接调整 */
+            .top-links {
+                font-size: 11px;
+                top: 15px;
+                right: 15px;
+                gap: 10px;
+            }
+            
+            /* 功能区域调整 */
+            .features {
+                padding: 60px 5%;
+            }
+            
+            .feature {
+                margin-bottom: 60px;
+            }
+            
+            .feature-content {
+                padding: 0 15px;
+            }
+            
+            .feature-number {
+                font-size: 3.5rem;
+                margin-bottom: 10px;
+            }
+            
+            .feature-title {
+                font-size: 1.6rem;
+                margin-bottom: 15px;
+            }
+            
+            .feature-desc {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+            
+            .feature-image {
+                height: 200px;
+                margin-top: 20px;
+            }
+            
+            .feature-image-content {
+                font-size: 2rem;
+            }
+            
+            /* 背景效果调整 - 减少粒子数量，优化性能 */
+            .particle-flow {
+                display: none;
+            }
+            
+            /* 调整闪光点大小，使其在小屏幕上更合适 */
+            .sparkle {
+                width: 8px !important;
+                height: 8px !important;
+            }
+            
+            .sparkle.droplet {
+                width: 24px !important;
+                height: 24px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 多层次科技感背景容器 -->
+    <div class="background-container">
+        <!-- 动态光晕背景 -->
+        <div class="glow-effect" style="top: -20%; left: 20%; width: 700px; height: 700px; background: #3498db;"></div>
+        <div class="glow-effect" style="top: 60%; left: -10%; width: 600px; height: 600px; background: #8e44ad; animation-delay: 6s;"></div>
+        <div class="glow-effect" style="top: 50%; left: 70%; width: 800px; height: 800px; background: #41b8ff; animation-delay: 12s;"></div>
+        
+        <!-- 底层网格 -->
+        <div class="base-grid"></div>
+        
+        <!-- 粒子流容器 -->
+        <div class="particle-flow" id="particle-flow"></div>
+        
+        <!-- 连接线网络 -->
+        <div class="connection-network" id="connection-network"></div>
+    </div>
+    
+    <!-- 右上角导航链接 -->
+    <div class="top-links">
+        <a href="help.html">帮助中心</a>
+        <span class="divider">|</span>
+        <a href="privacy.html" id="privacy-link">隐私政策</a>
+    </div>
+
+    <!-- 主标题区域 -->
+    <section class="hero">
+        <div class="logo">AI Learning Companion</div>
+        <h1 class="main-title">智析学伴</h1>
+        <div class="subtitle-container">
+            <div class="subtitle" id="dynamic-subtitle">科技创新赋能教育</div>
+        </div>
+        <a href="home.html" class="btn">立即体验</a>
+    </section>
+    
+    <!-- 功能区域 -->
+    <section class="features">
+        <div class="feature">
+            <div class="feature-content">
+                <div class="feature-number">01</div>
+                <h2 class="feature-title">智能学习分析</h2>
+                <p class="feature-desc">基于深度学习的个性化分析引擎，实时追踪学习轨迹，精准识别知识薄弱点，为每位学生提供定制化学习路径建议，有效提升学习效率。</p>
+            </div>
+            <div class="feature-image">
+                <div class="feature-image-content">AI分析模型</div>
+            </div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-content">
+                <div class="feature-number">02</div>
+                <h2 class="feature-title">强化学习体验</h2>
+                <p class="feature-desc">抽象概念可视化，复杂知识具象化，激发学习兴趣，增强知识记忆深度与理解能力。</p>
+            </div>
+            <div class="feature-image">
+                <div class="feature-image-content">强化学习场景</div>
+            </div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-content">
+                <div class="feature-number">03</div>
+                <h2 class="feature-title">自适应练习系统</h2>
+                <p class="feature-desc">智能题库根据学习进度动态调整难度，实时生成针对性练习，通过精准反馈与渐进式挑战，帮助学生稳步突破学习瓶颈。</p>
+            </div>
+            <div class="feature-image">
+                <div class="feature-image-content">智能题库</div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检测是否为移动设备
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            // 创建粒子流效果 - 移动设备减少粒子数量以优化性能
+            const particleFlow = document.getElementById('particle-flow');
+            const particleCount = isMobile ? 20 : 50;
+            
+            function createParticles() {
+                // 移动设备可能禁用粒子流以提高性能
+                if (isMobile && window.innerWidth <= 480) return;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // 随机位置和属性
+                    const x = Math.random() * 100;
+                    const delay = Math.random() * 10;
+                    const duration = 8 + Math.random() * 12;
+                    const size = 1 + Math.random() * 2;
+                    const dirX = (Math.random() - 0.5) * 20; // 水平方向偏移
+                    
+                    // 设置粒子样式
+                    particle.style.left = `${x}%`;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.animation = `flowParticle ${duration}s linear ${delay}s infinite`;
+                    
+                    // 添加水平飘动效果
+                    particle.style.animation = `
+                        flowParticle ${duration}s linear ${delay}s infinite,
+                        floatX ${5 + Math.random() * 10}s ease-in-out ${delay}s infinite
+                    `;
+                    
+                    particleFlow.appendChild(particle);
+                }
+            }
+            
+            // 添加水平浮动动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes floatX {
+                    0%, 100% { transform: translateX(0); }
+                    50% { transform: translateX(var(--dirX, 0px)); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // 创建网络节点和连接线
+            const connectionNetwork = document.getElementById('connection-network');
+            const nodeCount = isMobile ? 15 : 30;
+            const networkNodes = [];
+            
+            function createNetwork() {
+                // 创建节点
+                for (let i = 0; i < nodeCount; i++) {
+                    const node = document.createElement('div');
+                    node.classList.add('network-node');
+                    
+                    // 随机位置
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    
+                    node.style.left = `${x}%`;
+                    node.style.top = `${y}%`;
+                    node.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    connectionNetwork.appendChild(node);
+                    networkNodes.push({ element: node, x, y });
+                }
+                
+                // 创建连接线
+                createConnections();
+            }
+            
+            function createConnections() {
+                // 为每个节点随机连接2-4个其他节点
+                networkNodes.forEach((node, index) => {
+                    const connections = 2 + Math.floor(Math.random() * 3);
+                    
+                    for (let i = 0; i < connections; i++) {
+                        // 随机选择另一个节点
+                        let targetIndex = Math.floor(Math.random() * networkNodes.length);
+                        if (targetIndex === index) {
+                            targetIndex = (targetIndex + 1) % networkNodes.length;
+                        }
+                        
+                        const target = networkNodes[targetIndex];
+                        createLink(node, target);
+                    }
+                });
+            }
+            
+            function createLink(node1, node2) {
+                const link = document.createElement('div');
+                link.classList.add('network-link');
+                
+                // 计算节点位置
+                const x1 = node1.x;
+                const y1 = node1.y;
+                const x2 = node2.x;
+                const y2 = node2.y;
+                
+                // 计算距离和角度
+                const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                
+                // 设置连接线样式
+                link.style.width = `${distance}%`;
+                link.style.height = '1px';
+                link.style.left = `${x1}%`;
+                link.style.top = `${y1}%`;
+                link.style.transform = `rotate(${angle}deg)`;
+                link.style.animationDelay = `${Math.random() * 5}s`;
+                
+                connectionNetwork.appendChild(link);
+            }
+            
+            // 创建随机闪光点
+            function createSparkle() {
+                // 最大同时存在的闪光点为15个
+                const maxSparkles = 15;
+                const existingSparkles = document.querySelectorAll('.sparkle:not(.droplet)').length;
+                if (existingSparkles >= maxSparkles) return;
+                  
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                  
+                // 为每个闪光点添加唯一ID
+                sparkle.id = 'sparkle-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                  
+                // 随机大小
+                const baseSize = isMobile ? 8 : 12;
+                const size = baseSize + Math.random() * (isMobile ? 4 : 8);
+                  
+                // 随机位置 - 改进算法使分布更随机，同时避开中心区域
+                let x, y;
+                const centerAvoidance = 0.3; // 避开中心30%的区域
+                  
+                // 使用正态分布实现更自然的随机分布
+                function randomNormal() {
+                    let u = 0, v = 0;
+                    while(u === 0) u = Math.random(); // 转换[0,1)到(0,1)
+                    while(v === 0) v = Math.random();
+                    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+                }
+                  
+                // 生成服从正态分布的坐标，然后归一化到[0,100)范围
+                let rawX = (randomNormal() * 0.3 + 0.5) * 100;
+                let rawY = (randomNormal() * 0.3 + 0.5) * 100;
+                  
+                // 检查是否在中间文字区域，如果是则偏移到边缘
+                // 扩大中心区域避开范围，确保文字区域没有闪光点
+                const centerX = 50;
+                const centerY = 50;
+                const centerRadius = 40; // 中心区域半径（百分比），扩大以确保文字区域无闪光点
+                  
+                // 计算到中心的距离
+                const distanceToCenter = Math.sqrt(
+                    Math.pow(rawX - centerX, 2) + 
+                    Math.pow(rawY - centerY, 2)
+                );
+                  
+                // 如果在中心区域内，则将点推到边缘
+                if (distanceToCenter < centerRadius) {
+                    // 计算角度
+                    const angle = Math.atan2(rawY - centerY, rawX - centerX);
+                    // 移到中心区域边缘
+                    x = centerX + Math.cos(angle) * centerRadius;
+                    y = centerY + Math.sin(angle) * centerRadius;
+                      
+                    // 额外添加随机偏移，使边缘分布更自然
+                    x += (Math.random() - 0.5) * 10;
+                    y += (Math.random() - 0.5) * 10;
+                } else {
+                    // 不在中心区域，直接使用生成的坐标
+                    x = rawX;
+                    y = rawY;
+                }
+                  
+                // 确保坐标在0-100范围内
+                x = Math.max(0, Math.min(100, x));
+                y = Math.max(0, Math.min(100, y));
+                  
+                // 记录闪光点的位置信息
+                sparkle.dataset.x = x;
+                sparkle.dataset.y = y;
+                sparkle.dataset.size = size;
+                  
+                // 随机动画延迟和持续时间
+                const delay = Math.random() * 4;
+                const duration = 6 + Math.random() * 6;
+                  
+                sparkle.style.width = `${size}px`;
+                sparkle.style.height = `${size}px`;
+                sparkle.style.left = `${x}%`;
+                sparkle.style.top = `${y}%`;
+                sparkle.style.animationDelay = `${delay}s`;
+                sparkle.style.animationDuration = `${duration}s`;
+                  
+                // 检测附近闪光点并触发连锁反应
+                function detectNearbySparkles(centerX, centerY, radius, currentSparkle) {
+                    // 获取所有未在绽开状态且不是水珠效果的闪光点
+                    const sparkles = document.querySelectorAll('.sparkle:not(.droplet):not(.popping)');
+                        
+                    // 计算每个闪光点与中心的距离
+                    const sparkleDistances = Array.from(sparkles).map(sparkle => {
+                        const rect = sparkle.getBoundingClientRect();
+                        const sparkleCenterX = rect.left + rect.width / 2;
+                        const sparkleCenterY = rect.top + rect.height / 2;
+                        const distance = Math.sqrt(
+                            Math.pow(sparkleCenterX - centerX, 2) +
+                            Math.pow(sparkleCenterY - centerY, 2)
+                        );
+                        return {
+                            sparkle: sparkle,
+                            distance: distance,
+                            x: sparkleCenterX,
+                            y: sparkleCenterY
+                        };
+                    });
+                        
+                    // 筛选出在范围内的闪光点，并按距离排序（最近的先触发）
+                    const nearbySparkles = sparkleDistances
+                        .filter(item => item.distance <= radius && item.sparkle !== currentSparkle)
+                        .sort((a, b) => a.distance - b.distance);
+                         
+                    // 性能优化：限制每次触发的闪光点数量
+                    const maxTriggers = isMobile ? 5 : 8;
+                    const triggers = nearbySparkles.slice(0, maxTriggers);
+                         
+                    // 触发闪光点，并为每个触发的闪光点设置不同的延迟，创造波纹传递效果
+                    triggers.forEach((item, index) => {
+                        setTimeout(() => {
+                            // 创建水珠绽开效果前先检查元素是否仍存在
+                            if (!item.sparkle.isConnected) return;
+                                
+                            // 标记为正在绽开，防止重复触发
+                            item.sparkle.classList.add('popping');
+                                
+                            // 创建水珠绽开效果
+                            const droplet = document.createElement('div');
+                            droplet.classList.add('sparkle', 'droplet');
+                            const size = parseFloat(item.sparkle.dataset.size);
+                            const dropletSize = isMobile ? size * 4 : size * 5;
+                                
+                            droplet.style.width = `${dropletSize}px`;
+                            droplet.style.height = `${dropletSize}px`;
+                            droplet.style.left = `${item.x}px`;
+                            droplet.style.top = `${item.y}px`;
+                            droplet.style.transform = 'translate(-50%, -50%)';
+                            droplet.style.animation = 'dropletEffect 1.2s forwards cubic-bezier(0.2, 0.8, 0.2, 1)';
+                                
+                            document.body.appendChild(droplet);
+                                
+                            // 递归触发下一级连锁反应 - 进一步增大触发半径
+                            setTimeout(() => {
+                                // 确保元素仍然存在
+                                if (item.sparkle.isConnected) {
+                                    // 扩大触发半径，确保波纹能触碰到更多闪光点
+                                    detectNearbySparkles(item.x, item.y, dropletSize * 0.9, item.sparkle);
+                                }
+                            }, 150);  // 缩短延迟时间，加快波纹传递
+                                
+                            // 移除原闪光点
+                            item.sparkle.style.opacity = '0';
+                            item.sparkle.style.transform = 'translateY(10px) scale(0.8)';
+                            setTimeout(() => {
+                                if (item.sparkle.isConnected) {
+                                    item.sparkle.remove();
+                                }
+                            }, 400); // 延长移除时间，确保连锁反应完成
+                                
+                            // 移除水珠效果
+                            setTimeout(() => {
+                                if (droplet.isConnected) {
+                                    droplet.remove();
+                                }
+                            }, 1200);
+                        }, 30 + index * 50 + Math.random() * 30); // 缩短延迟，使效果更连贯
+                    });
+                }
+                 
+                // 点击时的水珠绽开效果
+                const handleSparkleClick = (e) => {
+                    e.stopPropagation();
+                       
+                    // 防止短时间内重复触发
+                    if (sparkle.classList.contains('popping')) return;
+                    sparkle.classList.add('popping');
+                       
+                    // 精确计算点击位置（相对于视口）
+                    const clickX = isMobile ? e.touches[0].clientX : e.clientX;
+                    const clickY = isMobile ? e.touches[0].clientY : e.clientY;
+                       
+                    // 创建水珠绽开效果
+                    const droplet = document.createElement('div');
+                    droplet.classList.add('sparkle', 'droplet');
+                    const dropletSize = isMobile ? size * 3 : size * 4;  // 统一水珠大小
+                       
+                    // 使用固定定位确保位置准确
+                    droplet.style.width = `${dropletSize}px`;
+                    droplet.style.height = `${dropletSize}px`;
+                    droplet.style.left = `${clickX}px`;
+                    droplet.style.top = `${clickY}px`;
+                    // 关键修复：使用transform确保点击中心与效果中心一致
+                    droplet.style.transform = 'translate(-50%, -50%)';
+                    droplet.style.animation = 'dropletEffect 1s forwards cubic-bezier(0.2, 0.8, 0.2, 1)';
+                       
+                    document.body.appendChild(droplet);
+                       
+                    // 检测并触发附近闪光点，传递当前sparkle实例，增大初始检测半径
+                    detectNearbySparkles(clickX, clickY, dropletSize * 0.9, sparkle);
+                      
+                    // 移除原闪光点和事件监听
+                    sparkle.removeEventListener('click', handleSparkleClick);
+                    if (isMobile) {
+                        sparkle.removeEventListener('touchstart', handleSparkleClick);
+                    }
+                      
+                    // 平滑移除原闪光点
+                    sparkle.style.opacity = '0';
+                    sparkle.style.transform = 'translateY(10px) scale(0.8)';
+                    setTimeout(() => sparkle.remove(), 300);
+                      
+                    // 移除水珠效果
+                    setTimeout(() => {
+                        droplet.remove();
+                    }, 1000);
+                };
+                  
+                sparkle.addEventListener('click', handleSparkleClick);
+                if (isMobile) {
+                    sparkle.addEventListener('touchstart', handleSparkleClick);
+                }
+                  
+                document.body.appendChild(sparkle);
+                  
+                // 自动消失
+                setTimeout(() => {
+                    sparkle.removeEventListener('click', handleSparkleClick);
+                    if (isMobile) {
+                        sparkle.removeEventListener('touchstart', handleSparkleClick);
+                    }
+                    sparkle.remove();
+                }, 8000 + Math.random() * 6000);
+            }
+            
+            // 初始化5个闪光点
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => createSparkle(), i * 200); // 间隔创建，避免同时生成
+            }
+              
+            // 每1秒产生一个新的闪光点
+            setInterval(createSparkle, 1000);
+              
+            // 动态副标题切换
+            const subtitles = [
+                "科技创新赋能教育",
+                "个性化学习新体验",
+                "智能分析助力成长",
+                "让学习更高效精准"
+            ];
+            const subtitleElement = document.getElementById('dynamic-subtitle');
+            let currentSubtitle = 0;
+            
+            function showNextSubtitle() {
+                // 淡出当前副标题
+                subtitleElement.style.opacity = '0';
+                subtitleElement.style.transform = 'translateY(20px)';
+                subtitleElement.classList.remove('typing');
+                
+                setTimeout(() => {
+                    // 切换文本
+                    currentSubtitle = (currentSubtitle + 1) % subtitles.length;
+                    subtitleElement.textContent = subtitles[currentSubtitle];
+                    
+                    // 淡入新副标题并添加打字效果
+                    subtitleElement.style.opacity = '1';
+                    subtitleElement.style.transform = 'translateY(0)';
+                    
+                    setTimeout(() => {
+                        subtitleElement.classList.add('typing');
+                    }, 50);
+                }, 500);
+            }
+            
+            // 初始显示第一个副标题
+            setTimeout(() => {
+                subtitleElement.style.opacity = '1';
+                subtitleElement.style.transform = 'translateY(0)';
+                setTimeout(() => {
+                    subtitleElement.classList.add('typing');
+                }, 50);
+            }, 500);
+            
+            // 定时切换副标题
+            setInterval(showNextSubtitle, 4000);
+            
+            // 滚动时显示功能区域
+            function checkFeaturesVisibility() {
+                const features = document.querySelectorAll('.feature');
+                
+                features.forEach(feature => {
+                    const rect = feature.getBoundingClientRect();
+                    const windowHeight = window.innerHeight;
+                    
+                    // 当元素进入视口时显示
+                    if (rect.top < windowHeight * 0.85) {
+                        feature.classList.add('visible');
+                    }
+                });
+            }
+            
+            // 初始检查和滚动时检查
+            window.addEventListener('scroll', checkFeaturesVisibility);
+            checkFeaturesVisibility(); // 初始检查
+            
+            // 优化鼠标移动时的背景响应
+            document.addEventListener('mousemove', (e) => {
+                if (isMobile) return; // 移动设备不响应鼠标移动
+                
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                const movementScale = 1;
+                
+                // 降低更新频率，提升性能
+                if (Date.now() % 2 === 0) return;
+                
+                // 光晕移动
+                const glowEffects = document.querySelectorAll('.glow-effect');
+                glowEffects.forEach((glow, index) => {
+                    const moveX = (x - 0.5) * 100 * (index + 1) * movementScale;
+                    const moveY = (y - 0.5) * 100 * (index + 1) * movementScale;
+                    // 使用requestAnimationFrame确保平滑动画
+                    requestAnimationFrame(() => {
+                        glow.style.transform = `translate(${moveX}px, ${moveY}px) scale(1)`;
+                    });
+                });
+                
+                // 网络节点移动
+                networkNodes.forEach(node => {
+                    const moveX = (x - 0.5) * 12 * movementScale;
+                    const moveY = (y - 0.5) * 12 * movementScale;
+                    requestAnimationFrame(() => {
+                        node.element.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                    });
+                });
+            });
+            
+            // 初始化效果
+            createParticles();
+            createNetwork();
+            
+            // 初始加载时创建5个闪光点，稍微错开时间创建
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createSparkle, i * 300);
+            }
+            
+            // 生成间隔保持1秒
+            setInterval(createSparkle, 1000);
+        });
+    </script>
+</body>
+</html>

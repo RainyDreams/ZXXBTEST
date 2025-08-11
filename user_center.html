@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #4f46e5;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            text-align: center;
+            padding: 5px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .avatar:hover .avatar-edit {
+            opacity: 1;
+        }
+        
+        .user-info {
+            margin-left: 20px;
+        }
+        
+        .username {
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .username .edit-icon {
+            margin-left: 8px;
+            font-size: 16px;
+            color: #64748b;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .username:hover .edit-icon {
+            opacity: 1;
+        }
+        
+        .phone {
+            color: #64748b;
+            margin-top: 6px;
+        }
+        
+        .details {
+            padding: 25px 0;
+        }
+        
+        .detail-item {
+            display: flex;
+            margin-bottom: 18px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .detail-label {
+            width: 100px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #4f46e5;
+        }
+        
+        .error {
+            color: #ef4444;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .edit-form {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>个人中心</h1>
+        <div id="profileContainer" class="profile-card">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 从localStorage获取凭证
+            const userCode = localStorage.getItem('account');
+            const password = localStorage.getItem('password');
+            
+            if (!userCode || !password) {
+                showError("请先登录");
+                return;
+            }
+            
+            // 获取用户数据
+            fetchUserData(userCode, password);
+        });
+
+        async function fetchUserData(userCode, password) {
+            try {
+                const response = await fetch('user_center.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userCode, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status !== 200) {
+                    showError(data.message || "获取数据失败");
+                    return;
+                }
+                
+                renderProfile(data.data);
+            } catch (error) {
+                showError("网络请求失败");
+            }
+        }
+
+        function renderProfile(user) {
+            const container = document.getElementById('profileContainer');
+            container.innerHTML = `
+                <div class="profile-header">
+                    <div class="avatar" onclick="showAvatarForm()">
+                        ${user.avatar.startsWith('uploads') ? 
+                            `<img src="${user.avatar}" alt="用户头像">` : 
+                            `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;">
+                            ${user.username.charAt(0)}
+                            </div>`
+                        }
+                        <div class="avatar-edit">修改</div>
+                    </div>
+                    <div class="user-info">
+                        <div class="username" onclick="showUsernameForm()">
+                            ${user.username || '未设置昵称'}
+                            <span class="edit-icon">✏️</span>
+                        </div>
+                        <div class="phone">${user.phone}</div>
+                    </div>
+                </div>
+                <div class="details">
+                    <div class="detail-item">
+                        <div class="detail-label">省份</div>
+                        <div class="detail-value">${user.province || '--'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">学校</div>
+                        <div class="detail-value">${user.school || '--'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">姓名</div>
+                        <div class="detail-value">${user.real_name || '--'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">学籍ID</div>
+                        <div class="detail-value">${user.student_guid || '--'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">学校ID</div>
+                        <div class="detail-value">${user.school_guid || '--'}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const container = document.getElementById('profileContainer');
+            container.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        // 头像修改功能
+        window.showAvatarForm = function() {
+            const container = document.getElementById('profileContainer');
+            container.innerHTML += `
+                <div class="edit-form">
+                    <h3>修改头像</h3>
+                    <div class="form-group">
+                        <label for="avatarFile">选择新头像</label>
+                        <input type="file" id="avatarFile" class="form-control" accept="image/*">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="updateAvatar()">保存</button>
+                        <button class="btn btn-secondary" onclick="cancelEdit()">取消</button>
+                    </div>
+                </div>
+            `;
+        };
+
+        // 用户名修改功能
+        window.showUsernameForm = function() {
+            const container = document.getElementById('profileContainer');
+            container.innerHTML += `
+                <div class="edit-form">
+                    <h3>修改用户名</h3>
+                    <div class="form-group">
+                        <label for="newUsername">新用户名</label>
+                        <input type="text" id="newUsername" class="form-control" placeholder="请输入新的用户名">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="updateUsername()">保存</button>
+                        <button class="btn btn-secondary" onclick="cancelEdit()">取消</button>
+                    </div>
+                </div>
+            `;
+        };
+
+        // 取消编辑
+        window.cancelEdit = function() {
+            const userCode = localStorage.getItem('account');
+            const password = localStorage.getItem('password');
+            fetchUserData(userCode, password);
+        };
+
+        // 更新头像
+        window.updateAvatar = function() {
+            const fileInput = document.getElementById('avatarFile');
+            if (!fileInput.files.length) {
+                alert('请选择头像文件');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('avatar', file);
+            formData.append('userCode', localStorage.getItem('account'));
+            formData.append('password', localStorage.getItem('password'));
+            
+            fetch('update_avatar.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('头像更新成功');
+                    fetchUserData(localStorage.getItem('account'), localStorage.getItem('password'));
+                } else {
+                    alert('头像更新失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('网络请求失败');
+            });
+        };
+
+        // 更新用户名
+        window.updateUsername = function() {
+            const newUsername = document.getElementById('newUsername').value.trim();
+            if (!newUsername) {
+                alert('请输入新的用户名');
+                return;
+            }
+            
+            fetch('update_username.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userCode: localStorage.getItem('account'),
+                    password: localStorage.getItem('password'),
+                    newUsername: newUsername
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('用户名更新成功');
+                    fetchUserData(localStorage.getItem('account'), localStorage.getItem('password'));
+                } else {
+                    alert('用户名更新失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('网络请求失败');
+            });
+        };
+    </script>
+</body>
+</html>

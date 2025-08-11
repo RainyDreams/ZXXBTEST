@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私协议 - 智析学伴</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #0c0f1d;
+            color: #e0e7ff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 科技感背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(41, 128, 185, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(155, 89, 182, 0.15) 0%, transparent 40%),
+                linear-gradient(135deg, #0c0f1d 0%, #1c2333 100%);
+            z-index: -2;
+        }
+
+        /* 动态线条背景效果 */
+        .grid-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(65, 184, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(65, 184, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 50px 50px;
+            }
+        }
+
+        /* 右上角导航链接 */
+        .top-links {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            z-index: 100;
+            font-size: 14px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .top-links a {
+            color: rgba(224, 231, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .top-links a:hover {
+            color: #41b8ff;
+            text-shadow: 0 0 8px rgba(65, 184, 255, 0.6);
+        }
+
+        .divider {
+            color: rgba(224, 231, 255, 0.4);
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 50px;
+        }
+
+        /* 隐私协议样式 */
+        .privacy-container {
+            background-color: white;
+            color: #333;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .privacy-header {
+            background: linear-gradient(90deg, #3498db, #8e44ad);
+            color: white;
+            padding: 25px 30px;
+        }
+
+        .privacy-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .privacy-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .privacy-content {
+            padding: 30px;
+            line-height: 1.7;
+        }
+
+        .privacy-content h3 {
+            color: #3498db;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .privacy-content h4 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: #2980b9;
+        }
+
+        .privacy-content p {
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .privacy-content ul {
+            padding-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .privacy-content li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .privacy-content li::before {
+            content: "•";
+            color: #3498db;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-weight: bold;
+        }
+
+        .highlight {
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 3px solid #3498db;
+        }
+
+        .privacy-footer {
+            padding: 20px 30px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #3498db, #8e44ad);
+            color: white;
+            padding: 10px 25px;
+            font-size: 1rem;
+            border-radius: 30px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            margin-top: 30px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.6);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 900px) {
+            .privacy-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .privacy-title {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding-top: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 动态网格背景 -->
+    <div class="grid-lines"></div>
+
+    <!-- 右上角导航链接 -->
+    <div class="top-links">
+        <a href="index.html">返回</a>
+    </div>
+
+    <div class="container">
+        <div class="privacy-container">
+            <div class="privacy-header">
+                <h2 class="privacy-title">AI学习解题软件隐私政策</h2>
+                <div class="privacy-subtitle">生效日期：2025年8月6日 | 最后更新：2025年8月6日</div>
+            </div>
+            <div class="privacy-content">
+                <h3>一、我们收集的信息</h3>
+
+                <h4>1. 用户账户信息</h4>
+                <ul>
+                    <li>注册时收集：手机号/邮箱、用户名、密码（加密存储）</li>
+                    <li>学生身份验证：学校、年级（用于个性化学习）</li>
+                </ul>
+
+                <h4>2. 学习行为数据</h4>
+                <ul>
+                    <li>解题记录：上传的题目（含文字/图片）、答题步骤、批改结果</li>
+                    <li>交互数据：AI功能使用频次、功能偏好、页面停留时长</li>
+                </ul>
+
+                <h4>3. 设备与技术信息</h4>
+                <ul>
+                    <li>设备标识符（如IMEI）、操作系统版本、网络类型</li>
+                    <li>AI服务必需：摄像头权限（用于拍照搜题）、存储权限（题目缓存）</li>
+                </ul>
+
+                <h4>4. 未成年人信息（若适用）</h4>
+                <ul>
+                    <li>根据COPPA要求：仅收集必要信息，需家长书面同意</li>
+                    <li>禁用行为追踪广告</li>
+                </ul>
+
+                <h3>二、数据共享与披露</h3>
+
+                <h4>1. 严格禁止</h4>
+                <ul>
+                    <li>不出售或出租用户题目数据给第三方</li>
+                    <li>不将学生答题记录用于广告精准投放</li>
+                </ul>
+
+                <h4>2. 有限共享场景</h4>
+                <ul>
+                    <li>第三方AI服务商（如OCR识别服务）：仅共享题目图片，签订数据保护协议</li>
+                    <li>法律要求：配合司法机关提供必要信息</li>
+                </ul>
+
+                <div class="highlight">
+                    <strong>重要提示：</strong> 在任何情况下，我们都不会将您的学习数据用于与教育无关的商业目的，保护您的隐私是我们的首要任务。
+                </div>
+
+                <h3>三、AI数据处理特别说明</h3>
+
+                <h4>1. 模型训练</h4>
+                <ul>
+                    <li>用户上传的题目及解析将匿名化脱敏后用于算法训练</li>
+                    <li>用户可设置"禁用我的数据训练模型"（账户设置中开启）</li>
+                </ul>
+
+                <h4>2. 解题结果透明度</h4>
+                <ul>
+                    <li>AI生成答案会标注"算法建议，仅供参考"</li>
+                    <li>关键解题步骤提供置信度提示（如"此步骤准确率92%"）</li>
+                </ul>
+
+                <h3>四、数据安全措施</h3>
+                <ul>
+                    <li>存储加密：用户上传题目采用AES-256加密存储</li>
+                    <li>权限隔离：教师/家长账号与学生账号数据访问分级控制</li>
+                    <li>定期审计：每季度进行数据安全渗透测试</li>
+                </ul>
+
+                <h3>五、您的权利</h3>
+
+                <h4>1. 数据管理</h4>
+                <ul>
+                    <li>导出学习报告：支持CSV格式导出历史答题记录</li>
+                    <li>删除账户：7天内可自助恢复，永久删除后题目数据不可逆清除</li>
+                </ul>
+
+                <h4>2. 未成年人保护</h4>
+                <ul>
+                    <li>家长可通过 <a href="mailto:privacy@zhixi.cn">privacy@zhixi.cn</a> 或客服申请查阅子女数据</li>
+                    <li>默认关闭"学习数据成就分享"功能</li>
+                </ul>
+
+                <h3>六、政策更新</h3>
+                <ul>
+                    <li>重大变更（如新增数据用途）将通过APP弹窗+短信通知</li>
+                    <li>历史版本可在<a href="#">设置-关于我们</a>中查阅</li>
+                </ul>
+            </div>
+            <div class="privacy-footer">
+                智析学伴 © 2025 版权所有 | 隐私政策版本 v2.3
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="home.html" class="back-btn">返回首页</a>
+        </div>
+    </div>
+
+    <script>
+        // 简单的页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.style.opacity = 0;
+            setTimeout(function() {
+                document.body.style.transition = 'opacity 1s ease';
+                document.body.style.opacity = 1;
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+:root {
+  --logo-gradient-start: #3b82f6;
+  --logo-gradient-middle: #8b5cf6;
+  --logo-gradient-end: #ec4899;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  position: relative;
+  display: inline-block;
+}
+
+.logo-text {
+  background: linear-gradient(90deg, var(--logo-gradient-start), var(--logo-gradient-middle), var(--logo-gradient-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  z-index: 1;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.logo::before {
+  content: '智析学伴';
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(90deg, var(--logo-gradient-start), var(--logo-gradient-middle), var(--logo-gradient-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: blur(3px);
+  opacity: 0.7;
+  z-index: 0;
+  animation: glowShift 6s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.7), 0 0 20px rgba(139, 92, 246, 0.5), 0 0 30px rgba(139, 92, 246, 0.3);
+  }
+}
+
+@keyframes glowShift {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(-2px) translateY(-1px);
+  }
+  50% {
+    transform: translateX(0) translateY(-2px);
+  }
+  75% {
+    transform: translateX(2px) translateY(-1px);
+  }
+}

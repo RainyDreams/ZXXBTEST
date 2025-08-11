@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>科技感倒计时</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  
+  <!-- 配置Tailwind自定义主题 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#06b6d4',
+            secondary: '#8b5cf6',
+            dark: '#0f172a',
+            neon: '#34d399',
+            cyber: '#ec4899',
+            help: {
+              primary: '#3b82f6',
+              secondary: '#10b981',
+              accent: '#6366f1',
+              dark: '#1e293b'
+            }
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+          },
+          keyframes: {
+            glow: {
+              '0%': { 'box-shadow': '0 0 5px rgba(6, 182, 212, 0.5), 0 0 10px rgba(6, 182, 212, 0.3)' },
+              '100%': { 'box-shadow': '0 0 10px rgba(6, 182, 212, 0.8), 0 0 20px rgba(6, 182, 212, 0.6), 0 0 30px rgba(6, 182, 212, 0.4)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
+      }
+      .text-shadow-neon {
+        text-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 20px rgba(139, 92, 246, 0.5);
+      }
+      .bg-grid {
+        background-size: 40px 40px;
+        background-image: 
+          linear-gradient(to right, rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+      }
+      .glass-effect {
+        backdrop-filter: blur(10px);
+        background: rgba(15, 23, 42, 0.6);
+      }
+      .countdown-box {
+        position: relative;
+        overflow: hidden;
+      }
+      .countdown-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        z-index: -1;
+      }
+      .nav-item {
+        @apply relative px-3 py-2 hover:text-primary transition-colors duration-300;
+      }
+      .nav-item::after {
+        @apply content-[''] absolute left-0 bottom-0 w-0 h-0.5 bg-primary transition-all duration-300;
+      }
+      .nav-item:hover::after {
+        @apply w-full;
+      }
+      
+      /* 帮助中心导航样式 */
+      .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #e0f2fe, #3b82f6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: 1px;
+      }
+      .bg-gradient-tech {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+      }
+      .card-hover:active {
+        transform: translateY(-2px);
+      }
+      .glow {
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+      }
+      .animate-pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      .timeline-bar {
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+        position: relative;
+        overflow: hidden;
+      }
+      .timeline-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 30%;
+        background: rgba(255, 255, 255, 0.3);
+        animation: timelineGlow 2s ease-in-out infinite alternate;
+      }
+      @keyframes timelineGlow {
+        0% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-gradient-tech text-gray-100 min-h-screen overflow-x-hidden">
+  <!-- 粒子背景容器 -->
+  <div id="particles-js" class="fixed top-0 left-0 w-full h-full z-0"></div>
+  
+  <!-- 网格背景叠加层 -->
+  <div class="bg-grid fixed top-0 left-0 w-full h-full z-10 opacity-50 pointer-events-none"></div>
+  
+  <!-- 帮助中心导航栏 -->
+  <header class="top-nav">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="logo"><span class="logo-text">智析学伴</span></div>
+      <nav class="hidden md:flex space-x-8">
+        <!-- 修改后的导航链接 -->
+        <a href="#" id="settingsTrigger" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">设置时间
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-help-primary transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a href="help.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">帮助中心
+          <span class="absolute -bottom-1 left-0 w=0 h-0.5 bg-help-primary transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a href="home.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">首页
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-help-primary transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      </nav>
+      <button class="md:hidden text-gray-300 hover:text-white" id="mobile-menu-button">
+        <i class="fa fa-bars text-xl"></i>
+      </button>
+    </div>
+    <!-- 移动端菜单 -->
+    <div class="md:hidden hidden bg-dark/95 border-b border-gray-700" id="mobile-menu">
+      <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+        <!-- 修改后的移动端导航链接 -->
+        <a href="#" id="mobileSettingsTrigger" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-help-primary">设置时间</a>
+        <a href="help.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-help-primary">帮助中心</a>
+        <a href="home.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-help-primary">首页</a>
+      </div>
+    </div>
+  </header>
+  
+  <!-- 主容器 -->
+  <div class="relative z-20 container mx-auto px-4 py-12 flex flex-col min-h-screen mt-8">
+    <!-- 倒计时主要内容区域 -->
+    <main class="flex-grow flex flex-col items-center justify-center">
+      <!-- 倒计时标题 -->
+      <div class="mb-10 text-center">
+        <h2 id="countdownTitle" class="text-[clamp(1.5rem,5vw,3rem)] font-bold mb-4 text-shadow-neon transition-all duration-500">
+          距离目标日期
+        </h2>
+        <p id="targetDateDisplay" class="text-gray-400 text-lg md:text-xl opacity-80">
+          设置一个目标日期开始倒计时
+        </p>
+      </div>
+      
+      <!-- 倒计时显示区域 -->
+      <div id="countdownContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-16 w-full max-w-5xl">
+        <!-- 天 -->
+        <div class="countdown-box rounded-xl p-6 md:p-8 border border-primary/20 backdrop-blur-sm text-center transform hover:scale-105 transition-all duration-300 animate-glow">
+          <div id="days" class="text-[clamp(2rem,8vw,4rem)] font-bold text-primary mb-2 text-shadow">00</div>
+          <div class="text-gray-400 uppercase text-sm md:text-base">天</div>
+        </div>
+        
+        <!-- 时 -->
+        <div class="countdown-box rounded-xl p-6 md:p-8 border border-primary/20 backdrop-blur-sm text-center transform hover:scale-105 transition-all duration-300 animate-glow" style="animation-delay: 0.2s">
+          <div id="hours" class="text-[clamp(2rem,8vw,4rem)] font-bold text-primary mb-2 text-shadow">00</div>
+          <div class="text-gray-400 uppercase text-sm md:text-base">时</div>
+        </div>
+        
+        <!-- 分 -->
+        <div class="countdown-box rounded-xl p-6 md:p-8 border border-primary/20 backdrop-blur-sm text-center transform hover:scale-105 transition-all duration-300 animate-glow" style="animation-delay: 0.4s">
+          <div id="minutes" class="text-[clamp(2rem,8vw,4rem)] font-bold text-primary mb-2 text-shadow">00</div>
+          <div class="text-gray-400 uppercase text-sm md:text-base">分</div>
+        </div>
+        
+        <!-- 秒 -->
+        <div class="countdown-box rounded-xl p-6 md:p-8 border border-primary/20 backdrop-blur-sm text-center transform hover:scale-105 transition-all duration-300 animate-glow" style="animation-delay: 0.6s">
+          <div id="seconds" class="text-[clamp(2rem,8vw,4rem)] font-bold text-primary mb-2 text-shadow">00</div>
+          <div class="text-gray-400 uppercase text-sm md:text-base">秒</div>
+        </div>
+      </div>
+      
+      <!-- 进度可视化 -->
+      <div class="w-full max-w-3xl glass-effect rounded-xl p-6 border border-secondary/30 mb-12">
+        <div class="flex justify-between mb-4">
+          <h3 class="text-lg font-semibold text-secondary">倒计时进度</h3>
+          <span id="progressPercent" class="text-neon font-mono">0%</span>
+        </div>
+        <div class="h-3 w-full bg-dark/50 rounded-full overflow-hidden mb-2">
+          <div id="progressBar" class="h-full bg-gradient-to-r from-primary to-secondary w-0 transition-all duration-1000 ease-out"></div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500">
+          <span id="startDateText">开始日期</span>
+          <span id="endDateText">目标日期</span>
+        </div>
+      </div>
+      
+      <!-- 时间分布可视化改进 -->
+      <div class="w-full max-w-3xl glass-effect rounded-xl p-6 border border-secondary/30 mb-8">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-secondary">时间分布</h3>
+          <div id="expectedTime" class="text-sm text-gray-400">倒计时结束后：预计时间</div>
+        </div>
+        
+        <!-- 时间线可视化 -->
+        <div class="flex justify-between items-center mb-6">
+          <div class="text-xs text-gray-500">开始</div>
+          <div class="flex-1 mx-3">
+            <div class="timeline-bar"></div>
+          </div>
+          <div class="text-xs text-gray-500">目标</div>
+        </div>
+        
+        <!-- 改进的时间分布图表 -->
+        <div class="h-64">
+          <canvas id="timeChart"></canvas>
+        </div>
+        
+        <!-- 详细时间信息面板 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+          <div class="p-3 rounded-lg bg-dark/60 border border-primary/20 text-center">
+            <div class="text-sm text-gray-400 mb-1">剩余天数</div>
+            <div id="daysDetail" class="text-xl font-bold text-primary">0</div>
+          </div>
+          <div class="p-3 rounded-lg bg-dark/60 border border-primary/20 text-center">
+            <div class="text-sm text-gray-400 mb-1">剩余小时</div>
+            <div id="hoursDetail" class="text-xl font-bold text-primary">0</div>
+          </div>
+          <div class="p-3 rounded-lg bg-dark/60 border border-primary/20 text-center">
+            <div class="text-sm text-gray-400 mb-1">剩余分钟</div>
+            <div id="minutesDetail" class="text-xl font-bold text-primary">0</div>
+          </div>
+          <div class="p-3 rounded-lg bg-dark/60 border border-primary/20 text-center">
+            <div class="text-sm text-gray-400 mb-1">剩余秒数</div>
+            <div id="secondsDetail" class="text-xl font-bold text-primary">0</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- 帮助中心页脚 -->
+  <footer class="bg-dark border-t border-gray-800 py-8 mt-16">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="col-span-1 md:col-span-1">
+          <div class="flex items-center space-x-2 mb-4">
+            <i class="fa fa-graduation-cap text-help-primary text-2xl"></i>
+            <span class="text-xl font-bold text-white">智析学伴</span>
+          </div>
+          <p class="text-gray-400 text-sm mb-4">智能分析，精准伴学，让学习更高效。</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-help-primary transition-colors duration-300"><i class="fa fa-weibo text-lg"></i></a>
+            <a href="#" class="text-gray-400 hover:text-help-primary transition-colors duration-300"><i class="fa fa-wechat text-lg"></i></a>
+            <a href="#" class="text-gray-400 hover:text-help-primary transition-colors duration-300"><i class="fa fa-github text-lg"></i></a>
+          </div>
+        </div>
+        <div class="col-span-1">
+          <h4 class="text-white font-medium mb-4">快速链接</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="home.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">首页
+              <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-help-primary transition-all duration-300 group-hover:w-full"></span>
+            </a></li>
+            <li><a href="help.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">帮助中心
+              <span class="absolute -bottom-0.5 left-0 w=0 h-0.5 bg-help-primary transition-all duration-300 group-hover:w-full"></span>
+            </a></li>
+            <li><a href="#" id="footerSettingsTrigger" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">设置时间
+              <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-help-primary transition-all duration-300 group-hover:w-full"></span>
+            </a></li>
+          </ul>
+        </div>
+        <div class="col-span-1">
+          <h4 class="text-white font-medium mb-4">联系我们</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li class="flex items-start space-x-2">
+              <i class="fa fa-envelope-o mt-1"></i>
+              <span>support@zhixibanxue.com</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <i class="fa fa-phone mt-1"></i>
+              <span>400-123-4567</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <i class="fa fa-map-marker mt-1"></i>
+              <span>北京市海淀区中关村大街1号</span>
+            </li>
+          </ul>
+        </div>
+        <div class="col-span-1">
+          <h4 class="text-white font-medium mb-4">关注我们</h4>
+          <p class="text-gray-400 text-sm mb-4">扫描二维码，关注智析学伴公众号</p>
+          <div class="bg-white p-2 inline-block rounded-lg">
+            <div class="w-32 h-32 bg-gray-200 flex items-center justify-center">
+              <i class="fa fa-qrcode text-gray-500 text-5xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
+        <p>© 2023 智析学伴 版权所有</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- 设置模态框 -->
+  <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="modalOverlay"></div>
+    
+    <div class="relative glass-effect rounded-2xl p-6 md:p-8 w-full max-w-md border border-primary/30 transform scale-95 transition-transform duration-300">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold text-primary">设置倒计时</h3>
+        <button id="closeSettingsBtn" class="text-gray-400 hover:text-white transition-colors">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <form id="settingsForm" class="space-y-6">
+        <div>
+          <label for="countdownTitleInput" class="block text-sm font-medium text-gray-300 mb-2">倒计时标题</label>
+          <input type="text" id="countdownTitleInput" class="w-full px-4 py-3 rounded-lg bg-dark/60 border border-primary/30 focus:border-primary focus:ring-1 focus:ring-primary transition-all text-white" placeholder="例如：新年到来">
+        </div>
+        
+        <div>
+          <label for="targetDateInput" class="block text-sm font-medium text-gray-300 mb-2">目标日期和时间</label>
+          <input type="datetime-local" id="targetDateInput" class="w-full px-4 py-3 rounded-lg bg-dark/60 border border-primary/30 focus:border-primary focus:ring-1 focus:ring-primary transition-all text-white">
+        </div>
+        
+        <div class="pt-4">
+          <button type="submit" class="w-full py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center space-x-2">
+            <i class="fa fa-check"></i>
+            <span>保存设置</span>
+          </button>
+        </div>
+        
+        <div>
+          <button type="button" id="resetBtn" class="w-full py-3 rounded-lg bg-dark/60 border border-gray-700 text-gray-400 font-medium hover:text-white hover:border-gray-500 transition-all">
+            重置倒计时
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let countdownInterval;
+    let targetDate = null;
+    let startTime = null;
+    let timeChart = null;
+    
+    const daysElement = document.getElementById('days');
+    const hoursElement = document.getElementById('hours');
+    const minutesElement = document.getElementById('minutes');
+    const secondsElement = document.getElementById('seconds');
+    const countdownTitleElement = document.getElementById('countdownTitle');
+    const targetDateDisplayElement = document.getElementById('targetDateDisplay');
+    const progressBarElement = document.getElementById('progressBar');
+    const progressPercentElement = document.getElementById('progressPercent');
+    const startDateTextElement = document.getElementById('startDateText');
+    const endDateTextElement = document.getElementById('endDateText');
+    
+    // 新增元素
+    const expectedTimeElement = document.getElementById('expectedTime');
+    const daysDetailElement = document.getElementById('daysDetail');
+    const hoursDetailElement = document.getElementById('hoursDetail');
+    const minutesDetailElement = document.getElementById('minutesDetail');
+    const secondsDetailElement = document.getElementById('secondsDetail');
+    
+    const settingsTrigger = document.getElementById('settingsTrigger');
+    const mobileSettingsTrigger = document.getElementById('mobileSettingsTrigger');
+    const footerSettingsTrigger = document.getElementById('footerSettingsTrigger');
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const settingsForm = document.getElementById('settingsForm');
+    const countdownTitleInput = document.getElementById('countdownTitleInput');
+    const targetDateInput = document.getElementById('targetDateInput');
+    const resetBtn = document.getElementById('resetBtn');
+    
+    function initParticles() {
+      particlesJS('particles-js', {
+        "particles": {
+          "number": {
+            "value": 80,
+            "density": {
+              "enable": true,
+              "value_area": 800
+            }
+          },
+          "color": {
+            "value": "#06b6d4"
+          },
+          "shape": {
+            "type": "circle"
+          },
+          "opacity": {
+            "value": 0.2,
+            "random": true
+          },
+          "size": {
+            "value": 3,
+            "random": true
+          },
+          "line_linked": {
+            "enable": true,
+            "distance": 150,
+            "color": "#06b6d4",
+            "opacity": 0.1,
+            "width": 1
+          },
+          "move": {
+            "enable": true,
+            "speed": 1,
+            "direction": "none",
+            "random": true,
+            "straight": false,
+            "out_mode": "out",
+            "bounce": false
+          }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": {
+              "enable": true,
+              "mode": "grab"
+            },
+            "onclick": {
+              "enable": true,
+              "mode": "push"
+            },
+            "resize": true
+          },
+          "modes": {
+            "grab": {
+              "distance": 140,
+              "line_linked": {
+                "opacity": 0.3
+              }
+            },
+            "push": {
+              "particles_nb": 3
+            }
+          }
+        },
+        "retina_detect": true
+      });
+    }
+    
+    function initChart() {
+      const ctx = document.getElementById('timeChart').getContext('2d');
+      timeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['天', '时', '分', '秒'],
+          datasets: [{
+            label: '剩余时间',
+            data: [0, 0, 0, 0],
+            backgroundColor: [
+              'rgba(6, 182, 212, 0.7)',
+              'rgba(139, 92, 246, 0.7)',
+              'rgba(236, 72, 153, 0.7)',
+              'rgba(52, 211, 153, 0.7)'
+            ],
+            borderColor: [
+              'rgba(6, 182, 212, 1)',
+              'rgba(139, 92, 246, 1)',
+              'rgba(236, 72, 153, 1)',
+              'rgba(52, 211, 153, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                font: {
+                  size: 12
+                }
+              }
+            },
+            y: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                font: {
+                  size: 13,
+                  weight: 'bold'
+                }
+              }
+            }
+          },
+          animation: {
+            duration: 1000,
+            easing: 'easeOutQuart'
+          }
+        }
+      });
+    }
+    
+    function formatDate(date) {
+      return new Intl.DateTimeFormat('zh-CN', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    }
+    
+    function formatWeekday(date) {
+      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      return weekdays[date.getDay()];
+    }
+    
+    function updateCountdown() {
+      if (!targetDate) return;
+      
+      const now = new Date();
+      const difference = targetDate - now;
+      
+      if (difference <= 0) {
+        clearInterval(countdownInterval);
+        daysElement.textContent = '00';
+        hoursElement.textContent = '00';
+        minutesElement.textContent = '00';
+        secondsElement.textContent = '00';
+        targetDateDisplayElement.textContent = '倒计时已结束！';
+        progressBarElement.style.width = '100%';
+        progressPercentElement.textContent = '100%';
+        updateChart(0, 0, 0, 0);
+        return;
+      }
+      
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+      
+      animateNumberChange(daysElement, days);
+      animateNumberChange(hoursElement, hours);
+      animateNumberChange(minutesElement, minutes);
+      animateNumberChange(secondsElement, seconds);
+      
+      // 更新详细时间信息
+      daysDetailElement.textContent = days;
+      hoursDetailElement.textContent = hours;
+      minutesDetailElement.textContent = minutes;
+      secondsDetailElement.textContent = seconds;
+      
+      if (startTime) {
+        const totalDuration = targetDate - startTime;
+        const elapsed = now - startTime;
+        const progress = Math.min(100, (elapsed / totalDuration) * 100);
+        progressBarElement.style.width = `${progress}%`;
+        progressPercentElement.textContent = `${Math.round(progress)}%`;
+      }
+      
+      updateChart(days, hours, minutes, seconds);
+      
+      // 更新预期时间
+      const expectedDate = new Date(targetDate);
+      expectedTimeElement.textContent = `倒计时结束后：${formatWeekday(expectedDate)} ${formatDate(expectedDate)}`;
+    }
+    
+    function animateNumberChange(element, newValue) {
+      const currentValue = parseInt(element.textContent) || 0;
+      if (currentValue !== newValue) {
+        element.classList.add('scale-110', 'text-secondary');
+        setTimeout(() => {
+          element.textContent = newValue.toString().padStart(2, '0');
+          element.classList.remove('scale-110', 'text-secondary');
+        }, 200);
+      }
+    }
+    
+    function updateChart(days, hours, minutes, seconds) {
+      if (!timeChart) return;
+      
+      // 使用原始值（非秒转换）来显示各时间单位的实际数量
+      timeChart.data.datasets[0].data = [
+        days,
+        hours,
+        minutes,
+        seconds
+      ];
+      
+      timeChart.update();
+    }
+    
+    function startCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+      
+      updateCountdown();
+      countdownInterval = setInterval(updateCountdown, 1000);
+    }
+    
+    function saveSettings(title, date) {
+      const settings = {
+        title,
+        targetDate: date.toISOString(),
+        startTime: new Date().toISOString()
+      };
+      
+      localStorage.setItem('countdownSettings', JSON.stringify(settings));
+      loadSettings();
+    }
+    
+    function loadSettings() {
+      const settings = localStorage.getItem('countdownSettings');
+      
+      if (settings) {
+        const { title, targetDate: targetDateStr, startTime: startTimeStr } = JSON.parse(settings);
+        
+        if (title && targetDateStr && startTimeStr) {
+          countdownTitleElement.textContent = title;
+          countdownTitleInput.value = title;
+          
+          targetDate = new Date(targetDateStr);
+          startTime = new Date(startTimeStr);
+          
+          const dateStr = targetDate.toISOString().slice(0, 16);
+          targetDateInput.value = dateStr;
+          
+          targetDateDisplayElement.textContent = `目标：${formatDate(targetDate)}`;
+          startDateTextElement.textContent = `开始：${formatDate(startTime)}`;
+          endDateTextElement.textContent = `目标：${formatDate(targetDate)}`;
+          
+          startCountdown();
+          return true;
+        }
+      }
+      
+      const defaultTitle = "重要事件";
+      const defaultDate = new Date();
+      defaultDate.setDate(defaultDate.getDate() + 7);
+      
+      countdownTitleElement.textContent = defaultTitle;
+      countdownTitleInput.value = defaultTitle;
+      
+      const dateStr = defaultDate.toISOString().slice(0, 16);
+      targetDateInput.value = dateStr;
+      
+      return false;
+    }
+    
+    function resetCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+      
+      localStorage.removeItem('countdownSettings');
+      
+      daysElement.textContent = '00';
+      hoursElement.textContent = '00';
+      minutesElement.textContent = '00';
+      secondsElement.textContent = '00';
+      
+      // 重置详细时间信息
+      daysDetailElement.textContent = '0';
+      hoursDetailElement.textContent = '0';
+      minutesDetailElement.textContent = '0';
+      secondsDetailElement.textContent = '0';
+      
+      countdownTitleElement.textContent = '距离目标日期';
+      targetDateDisplayElement.textContent = '设置一个目标日期开始倒计时';
+      progressBarElement.style.width = '0%';
+      progressPercentElement.textContent = '0%';
+      
+      startDateTextElement.textContent = '开始日期';
+      endDateTextElement.textContent = '目标日期';
+      
+      expectedTimeElement.textContent = '倒计时结束后：预计时间';
+      
+      targetDate = null;
+      startTime = null;
+      
+      if (timeChart) {
+        timeChart.data.datasets[0].data = [0, 0, 0, 0];
+        timeChart.update();
+      }
+    }
+    
+    function openSettings() {
+      settingsModal.classList.remove('opacity-0', 'pointer-events-none');
+      settingsModal.querySelector('div:last-child').classList.remove('scale-95');
+      settingsModal.querySelector('div:last-child').classList.add('scale-100');
+    }
+    
+    function closeSettings() {
+      settingsModal.classList.add('opacity-0', 'pointer-events-none');
+      settingsModal.querySelector('div:last-child').classList.remove('scale-100');
+      settingsModal.querySelector('div:last-child').classList.add('scale-95');
+    }
+    
+    settingsTrigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      openSettings();
+    });
+    
+    mobileSettingsTrigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      openSettings();
+      document.getElementById('mobile-menu').classList.add('hidden');
+    });
+    
+    footerSettingsTrigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      openSettings();
+    });
+    
+    closeSettingsBtn.addEventListener('click', closeSettings);
+    modalOverlay.addEventListener('click', closeSettings);
+    
+    settingsForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const title = countdownTitleInput.value.trim() || '我的倒计时';
+      const targetDateStr = targetDateInput.value;
+      
+      if (targetDateStr) {
+        const target = new Date(targetDateStr);
+        const now = new Date();
+        
+        if (target > now) {
+          saveSettings(title, target);
+          closeSettings();
+        } else {
+          alert('请选择一个未来的日期和时间');
+        }
+      } else {
+        alert('请选择目标日期和时间');
+      }
+    });
+    
+    resetBtn.addEventListener('click', function() {
+      if (confirm('确定要重置倒计时吗？所有设置将被清除。')) {
+        resetCountdown();
+        closeSettings();
+      }
+    });
+    
+    // 移动端菜单功能
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
+    
+    window.addEventListener('DOMContentLoaded', function() {
+      initParticles();
+      initChart();
+      
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 16);
+      targetDateInput.value = dateStr;
+      
+      const hasSavedSettings = loadSettings();
+      
+      if (!hasSavedSettings) {
+        updateChart(0, 0, 0, 0);
+      }
+      
+      window.addEventListener('resize', function() {
+        if (timeChart) {
+          timeChart.resize();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <link rel="stylesheet" href="dynamic-logo.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>智析学伴 - 联系方式</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --secondary: #3b82f6;
+      --accent: #6366f1;
+      --light: #e0f2fe;
+      --dark: #0f172a;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-Index: 50;
+      background-color: rgba(30, 41, 59, 0.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(55, 65, 81, 0.8);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1e3a8a',
+            secondary: '#3b82f6',
+            accent: '#6366f1',
+            dark: '#0f172a',
+            light: '#e0f2fe',
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .bg-gradient-tech {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+      }
+      .card-hover:active {
+        transform: translateY(-2px);
+      }
+      .glow {
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+      }
+      .animate-pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-gradient-tech text-gray-100 min-h-screen">
+  <!-- 导航栏 -->
+  <header class="top-nav">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="logo"><span class="logo-text">智析学伴</span></div>
+      <nav class="hidden md:flex space-x-8">
+        <a href="feedback.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">在线反馈
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a href="faq.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">常见问题
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a href="contact.html" class="text-white font-medium transition-colors duration-300 relative group">联系方式
+          <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-primary"></span>
+        </a>
+        <a href="terms.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">服务条款
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a href="privacy2.html" class="text-gray-300 hover:text-white transition-colors duration-300 relative group">隐私政策
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      </nav>
+      <button class="md:hidden text-gray-300 hover:text-white" id="mobile-menu-button">
+        <i class="fa fa-bars text-xl"></i>
+      </button>
+    </div>
+    <!-- 移动端菜单 -->
+    <div class="md:hidden hidden bg-dark/95 border-b border-gray-700" id="mobile-menu">
+      <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+        <a href="feedback.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">在线反馈</a>
+        <a href="faq.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">常见问题</a>
+        <a href="contact.html" class="text-white font-medium py-2 transition-colors duration-300 pl-2 border-l-2 border-primary">联系方式</a>
+        <a href="privacy2.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">隐私政策</a>
+        <a href="terms.html" class="text-gray-300 hover:text-white py-2 transition-colors duration-300 pl-2 border-l-2 border-transparent hover:border-primary">服务条款</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容 -->
+  <main class="container mx-auto px-4 py-12">
+    <!-- 英雄区域 -->
+    <section class="text-center mb-16">
+      <h2 class="text-[clamp(2rem,5vw,3rem)] font-bold mb-6 text-white text-shadow">
+        联系<span class="text-accent">我们</span>
+      </h2>
+      <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
+        如有任何问题或建议，请随时通过以下方式联系我们，我们将尽快回复
+      </p>
+    </section>
+
+    <!-- 联系方式 -->
+    <section id="contact" class="mb-16">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center mb-10">
+          <div class="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mr-4">
+            <i class="fa fa-envelope text-accent text-xl"></i>
+          </div>
+          <h2 class="text-3xl font-bold text-white">联系方式</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="bg-dark/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 shadow-xl card-hover">
+            <h3 class="text-xl font-bold text-white mb-6">联系我们</h3>
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                  <i class="fa fa-map-marker text-accent"></i>
+                </div>
+                <div>
+                  <h4 class="font-medium text-white">公司地址</h4>
+                  <p class="text-gray-300">北京市海淀区中关村科技园区100号智析大厦</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                  <i class="fa fa-phone text-accent"></i>
+                </div>
+                <div>
+                  <h4 class="font-medium text-white">联系电话</h4>
+                  <p class="text-gray-300">400-123-4567</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                  <i class="fa fa-envelope text-accent"></i>
+                </div>
+                <div>
+                  <h4 class="font-medium text-white">电子邮箱</h4>
+                  <p class="text-gray-300">support@zhixueban.com</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                  <i class="fa fa-clock-o text-accent"></i>
+                </div>
+                <div>
+                  <h4 class="font-medium text-white">工作时间</h4>
+                  <p class="text-gray-300">周一至周五: 9:00 - 18:00</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-dark/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 shadow-xl card-hover">
+            <h3 class="text-xl font-bold text-white mb-6">关注我们</h3>
+            <p class="text-gray-300 mb-6">关注我们的社交媒体账号，获取最新动态和学习资源</p>
+            <div class="flex space-x-4 mb-8">
+              <a href="#" class="w-12 h-12 rounded-full bg-[#1877f2]/20 flex items-center justify-center text-[#1877f2] hover:bg-[#1877f2]/30 transition-colors duration-300">
+                <i class="fa fa-facebook"></i>
+              </a>
+              <a href="#" class="w-12 h-12 rounded-full bg-[#1da1f2]/20 flex items-center justify-center text-[#1da1f2] hover:bg-[#1da1f2]/30 transition-colors duration-300">
+                <i class="fa fa-twitter"></i>
+              </a>
+              <a href="#" class="w-12 h-12 rounded-full bg-[#e4405f]/20 flex items-center justify-center text-[#e4405f] hover:bg-[#e4405f]/30 transition-colors duration-300">
+                <i class="fa fa-instagram"></i>
+              </a>
+              <a href="#" class="w-12 h-12 rounded-full bg-[#ff0000]/20 flex items-center justify-center text-[#ff0000] hover:bg-[#ff0000]/30 transition-colors duration-300">
+                <i class="fa fa-youtube-play"></i>
+              </a>
+              <a href="#" class="w-12 h-12 rounded-full bg-[#25d366]/20 flex items-center justify-center text-[#25d366] hover:bg-[#25d366]/30 transition-colors duration-300">
+                <i class="fa fa-whatsapp"></i>
+              </a>
+            </div>
+            <div class="bg-gray-800 p-4 rounded-lg text-center">
+              <p class="text-gray-300 mb-2">扫码关注微信公众号</p>
+              <img src="qrcodes.svg" alt="微信公众号二维码" class="w-32 h-auto mx-auto">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 返回首页按钮 -->
+  <div class="container mx-auto px-4 py-8 flex justify-center">
+    <a href="home.html" class="bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center space-x-2">
+      <i class="fa fa-home"></i>
+      <span>返回首页</span>
+    </a>
+  </div>
+
+  <!-- 页脚 (已修改为faq模式) -->
+  <footer class="bg-dark border-t border-gray-800 py-8 mt-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="col-span-1 md:col-span-1">
+          <div class="flex items-center space-x-2 mb-4">
+            <i class="fa fa-graduation-cap text-primary text-2xl"></i>
+            <span class="text-xl font-bold text-white">智析学伴</span>
+          </div>
+          <p class="text-gray-400 text-sm mb-4">智能分析，精准伴学，让学习更高效。</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300"><i class="fa fa-weibo text-lg"></i></a>
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300"><i class="fa fa-wechat text-lg"></i></a>
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors duration-300"><i class="fa fa-github text-lg"></i></a>
+          </div>
+        </div>
+        <div class="col-span-1">
+          <h4 class="text-white font-medium mb-4">快速链接</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="feedback.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">在线反馈
+              <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a></li>
+            <li><a href="faq.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">常见问题
+              <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a></li>
+            <li><a href="contact.html" class="text-white font-medium transition-colors duration-300 inline-block relative group">联系方式
+              <span class="absolute -bottom-0.5 left-0 w-full h-0.5 bg-primary"></span>
+            </a></li>
+            <li><a href="terms.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">服务条款
+              <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a></li>
+            <li><a href="privacy2.html" class="text-gray-400 hover:text-white transition-colors duration-300 inline-block relative group">隐私政策
+              <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+            </a></li>
+          </ul>
+        </div>
+        <div class="col-span-1">
+          <h4 class="text-white font-medium mb-4">联系我们</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li class="flex items-start space-x-2">
+              <i class="fa fa-envelope-o mt-1"></i>
+              <span>support@zhixibanxue.com</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <i class="fa fa-phone mt-1"></i>
+              <span>400-123-4567</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <i class="fa fa-map-marker mt-1"></i>
+              <span>北京市海淀区中关村大街1号</span>
+            </li>
+          </ul>
+        </div>
+        <div class="col-span-1">
+          <h4 class="text-white font-medium mb-4">关注我们</h4>
+          <p class="text-gray-400 text-sm mb-4">扫描二维码，关注智析学伴公众号</p>
+          <div class="bg-white p-2 inline-block rounded-lg">
+            <div class="w-32 h-32 bg-gray-200 flex items-center justify-center">
+              <i class="fa fa-qrcode text-gray-500 text-5xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
+        <p>© 2023 智析学伴 版权所有</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 移动端菜单切换
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    // 优化触摸和点击事件处理
+    function handleMenuToggle() {
+      mobileMenu.classList.toggle('hidden');
+      // 防止事件冒泡
+      event.stopPropagation();
+    }
+
+    // 添加点击事件
+    mobileMenuButton.addEventListener('click', handleMenuToggle);
+    // 添加触摸事件以优化移动设备体验
+    mobileMenuButton.addEventListener('touchstart', function(e) {
+      // 防止触发鼠标事件
+      e.preventDefault();
+      handleMenuToggle();
+    }, { passive: false });
+
+    // 点击页面其他区域关闭菜单
+    document.addEventListener('click', function() {
+      if (!mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+      }
+    });
+
+    // 阻止菜单内部点击事件冒泡
+    mobileMenu.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+
+    // 为社交媒体图标添加触摸反馈
+    const socialIcons = document.querySelectorAll('a[href] i.fa');
+    socialIcons.forEach(icon => {
+      const parent = icon.parentElement;
+      parent.addEventListener('touchstart', function() {
+        this.style.transform = 'scale(0.95)';
+      });
+      parent.addEventListener('touchend', function() {
+        this.style.transform = 'scale(1)';
+      });
+    });
+  </script>
+</body>
+</html>
