@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- //dayjs -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/dayjs/1.10.7/dayjs.min.js"></script>
+  </head>
+  <body>
+    <script>
+
+      // Link Brain
+      async function getStreamText(url, postData, param, again) {
+        try {
+          const postOptions = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(postData),
+            credentials: "include",
+          };
+          const response = await fetch(url, postOptions);
+          if (response.status != 200) {
+            if (response.status == 400) {
+              if (!again) {
+                return await getStreamText(url, postData, param, 1);
+              } else {
+                throw new Error("鉴权错误");
+              }
+            } else {
+              // if(param.onerror) param.onerror(new Error(await response.text()));
+              throw new Error("会话传输出现错误");
+            }
+            // defaultFailed(response.statusText,3)
+            // return;
+          }
+          try {
+            (async () => {
+              if (param.onopen) param.onopen();
+            })();
+          } catch (e) { console.error(e) }
+          const model = postData.model;
+          // // console.log(model)
+          const reader = response.body.getReader();
+          let decoder = new TextDecoder();
+          let buffer = "";
+          let errorCount = 0;
+          while (true) {
+            if (param.stopStatus && param.stopStatus.value) {
+              param.onclose(false, postData.model);
+              break;
+            }
+            try {
+              const { done, value } = await reader.read();
+              if (done) {
+                if (buffer) {
+                  param.onmessage(buffer.replace("data: ", ""), postData.model);
+                }
+                param.onclose(false, postData.model);
+                break;
+              }
+              const decodedText = decoder.decode(value, { stream: true });
+              buffer += decodedText;
+              let newlineIndex;
+              while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+                const line = buffer.substring(0, newlineIndex);
+                if (line) {
+                  param.onmessage(line.replace("data: ", ""), postData.model);
+                }
+                buffer = buffer.substring(newlineIndex + 1);
+              }
+            } catch (e) {
+              console.error(e);
+              errorCount++;
+              if (errorCount > 10) {
+                param.onclose();
+                defaultFailed(e, 3);
+                break;
+              }
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          param.onclose(true, postData.model);
+          if (param.onerror) param.onerror(error);
+          // defaultFailed(error,3)
+          // // console.error(error)
+          // defaultFailed(error,2)
+        }
+      }
+
+      async function chat(param){
+        await getStreamText('https://lingben.top/api/ai/deepMind', 
+          { sessionID: param.sessionID,
+            model:param.model,
+            content: param.content,
+            vf:'sun ao test', 
+            useAnalysis:param.useAnalysis,
+            useInternet:param.useInternet,
+            useTask:param.useTask,
+            useDraw:param.useDraw,
+            usePreview:param.usePreview,
+            time:(dayjs().format('YYYY年MM月DD日 ddd') )+new Date().toTimeString(),
+            photo:param.photo,
+            audio:param.audio
+          },
+          {
+            onopen:param.onopen,
+            onmessage:param.onmessage,
+            onclose:param.onclose,
+            stopStatus:param.stopStatus,
+            onerror:param.onerror||(()=>{})
+          }
+        );
+      }
+
+      async function main(){
+        await chat({
+          sessionID:'',
+          model:'',
+          content:'生成一个黑洞',
+          useAnalysis:false,
+          useInternet:false,
+          useTask:false,
+          useDraw:false,
+          usePreview:true,
+          photo:'',
+          audio:'',
+          onopen:()=>{},
+          onmessage:(message,model)=>{
+            console.log(message)
+          },
+          onclose:(error,model)=>{},
+          stopStatus:{value:false}
+        });
+      }
+
+      main()
+    </script>
+  </body>
+</html>
